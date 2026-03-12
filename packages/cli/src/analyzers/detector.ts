@@ -6,7 +6,7 @@
  */
 
 import { join } from 'path'
-import { readFile, readFileSync } from 'fs'
+import { readFileSync } from 'fs'
 import type { DetectedStack } from '../types'
 
 // --- Detection Maps ────────────────────────────────────────────────────────────
