@@ -1,0 +1,43 @@
+{
+    "name": "@route-auditor/cli",
+    "version": "1.0.0",
+    "description": "Security auditor for Next.js routes — App Router, Pages Router, API Routes",
+    "keywords": ["nextjs", "security", "audit", "cli"],
+    "license": "MIT",
+    "bin": {
+      "route-auditor": "./dist/index.js"
+    },
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "import": "./dist/index.js",
+        "require": "./dist/index.cjs"
+      }
+    },
+    "files": ["dist"],
+    "scripts": {
+      "build": "tsup",
+      "dev": "tsup --watch",
+      "test": "vitest",
+      "test:coverage": "vitest --coverage",
+      "typecheck": "tsc --noEmit",
+      "clean": "rm -rf dist",
+      "release": "pnpm build && npm publish"
+    },
+    "dependencies": {
+      "@route-auditor/shared": "workspace:*",
+      "commander": "latest",
+      "chalk": "latest",
+      "ora": "latest",
+      "boxen": "latest",
+      "glob": "latest",
+      "zod": "latest"
+    },
+    "devDependencies": {
+      "@types/node": "latest",
+      "tsup": "latest",
+      "typescript": "latest",
+      "vitest": "latest"
+    }
+}

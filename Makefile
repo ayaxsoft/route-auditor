@@ -8,4 +8,6 @@ reinstall: ## Reinstall the project dependencies
 	@echo "Reinstalling project dependencies..."
 	rm -rf node_modules
 	rm -rf pnpm-lock.yaml
+	rm -rf packages/*/node_modules
+	rm -rf packages/*/dist
 	pnpm install
