@@ -30,6 +30,7 @@ export interface DetectedStack {
 // ─── Next.js route ──────────────────────────────────────────────────────────
 
 export interface RouteFile {
+  projectRoot: string // absolute path to the Next.js app root
   filePath: string // absolute file path on disk
   routePath: string // URL: /api/users/[id]
   routerType: RouterType
@@ -125,4 +126,18 @@ export interface AuditResult {
   vulnerabilities: Vulnerability[]
   summary: AuditSummary
   duration: number // milliseconds
+}
+
+// ─── Utils ─────────────────────────────────────────────────────────────────────
+
+export interface RawRouteFile {
+  filePath: string
+  routerType: Exclude<RouterType, 'mixed'>
+}
+
+export interface DynamicSegments {
+  isDynamic: boolean
+  dynamicSegments: string[]
+  hasCatchAll: boolean
+  hasOptionalCatchAll: boolean
 }

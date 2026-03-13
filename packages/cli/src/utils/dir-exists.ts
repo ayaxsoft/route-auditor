@@ -1,6 +1,6 @@
 import { access } from 'fs/promises'
 
-export async function dirExists(path: string): Promise<boolean> {
+export const dirExists = async (path: string): Promise<boolean> => {
   try {
     return access(path)
       .then(() => true)
