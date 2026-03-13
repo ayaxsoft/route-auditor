@@ -21,14 +21,16 @@ export const auditCommand = new Command('audit')
     const projectRoot = resolve(directory)
     const routes = await scanRoutes(projectRoot)
 
-    const routesByApp = Map.groupBy(routes, route => route.projectRoot)
+    const routesByApp = Map.groupBy(routes, (route) => route.projectRoot)
 
     console.log(`Found ${routes.length} routes across ${routesByApp.size} app(s)\n`)
 
     for (const [appRoot, appRoutes] of routesByApp) {
       console.log(`  ${appRoot}`)
       for (const route of appRoutes) {
-        console.log(`    ${route.routerType.padEnd(6)} ${route.isApiRoute ? '[API] ' : '[page]'} ${route.routePath}`)
+        console.log(
+          `    ${route.routerType.padEnd(6)} ${route.isApiRoute ? '[API] ' : '[page]'} ${route.routePath}`,
+        )
       }
       console.log()
     }

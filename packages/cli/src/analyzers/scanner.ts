@@ -52,7 +52,9 @@ export const scanRoutes = async (projectRoot: string): Promise<RouteFile[]> => {
   const nextjsApps = await findNextjsApps(projectRoot)
   if (nextjsApps.length === 0) throw new Error(`No Next.js project found at <${projectRoot}>`)
 
-  const routesPerApp = await Promise.all(nextjsApps.map(innerAppRoot => scanRoutesForProject(innerAppRoot)))
+  const routesPerApp = await Promise.all(
+    nextjsApps.map((innerAppRoot) => scanRoutesForProject(innerAppRoot)),
+  )
   return routesPerApp.flat()
 }
 

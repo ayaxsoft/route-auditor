@@ -8,7 +8,9 @@ describe('filePathToRoutePath', () => {
     })
 
     it('removes multiple route groups from the path', () => {
-      expect(filePathToRoutePath('(dashboard)/[orgSlug]/(finance)/billing/page.tsx', 'app')).toBe('/[orgSlug]/billing')
+      expect(filePathToRoutePath('(dashboard)/[orgSlug]/(finance)/billing/page.tsx', 'app')).toBe(
+        '/[orgSlug]/billing',
+      )
     })
 
     it('returns / when only a route group remains', () => {

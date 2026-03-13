@@ -3,11 +3,13 @@ import { extname, dirname, basename } from 'path'
 
 const APP_ROUTE_FILENAMES = new Set(['page', 'route'])
 
-const isRouteGroup = (segment: string): boolean =>
-  segment.startsWith('(') && segment.endsWith(')')
+const isRouteGroup = (segment: string): boolean => segment.startsWith('(') && segment.endsWith(')')
 
 const removeRouteGroups = (filePath: string): string =>
-  filePath.split('/').filter(innerSegment => !isRouteGroup(innerSegment)).join('/')
+  filePath
+    .split('/')
+    .filter((innerSegment) => !isRouteGroup(innerSegment))
+    .join('/')
 
 export const filePathToRoutePath = (
   filePath: string,
