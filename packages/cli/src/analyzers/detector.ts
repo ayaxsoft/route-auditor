@@ -1,15 +1,8 @@
-/**
- * Detect the stack used in the project
- * This is the main function that will be used to detect the stack used in the project
- * It will scan the project for the presence of the stack
- * It will return a DetectedStack object
- */
-
-import { join } from 'path'
-import { readFileSync } from 'fs'
+import { readPackageJson } from '../utils/read-package-json'
+import { collectDependencies } from '../utils/collect-dependencies'
+import { detect } from '../utils/detect-from-map'
 import type { DetectedStack } from '../types'
 
-// --- Detection Maps ────────────────────────────────────────────────────────────
 const AUTH_MAP: Record<string, DetectedStack['auth']> = {
   'better-auth': 'better-auth',
   '@clerk/nextjs': 'clerk',
@@ -49,40 +42,7 @@ const RATE_LIMIT_MAP: Record<string, DetectedStack['rateLimit']> = {
   'next-rate-limit': 'custom',
 }
 
-// --- Helper Functions ────────────────────────────────────────────────────────────
-function readPackageJson(projectRoot: string): Record<string, unknown> {
-  try {
-    const raw = readFileSync(join(projectRoot, 'package.json'), 'utf8')
-    return JSON.parse(raw) as Record<string, unknown>
-  } catch (_error) {
-    return {}
-  }
-}
-
-function collectDependencies(pkg: Record<string, unknown>): Set<string> {
-  const dependencies = new Set<string>()
-  const sections = ['dependencies', 'devDependencies', 'peerDependencies']
-
-  for (const section of sections) {
-    const block = pkg[section]
-    if (block && typeof block === 'object') {
-      for (const name of Object.keys(block)) {
-        dependencies.add(name)
-      }
-    }
-  }
-
-  return dependencies
-}
-
-function detect<T>(deps: Set<string>, map: Record<string, T>): T | undefined {
-  for (const [pkg, value] of Object.entries(map)) {
-    if (deps.has(pkg)) return value
-  }
-  return undefined
-}
-
-export function detectStack(projectRoot: string): DetectedStack {
+export const detectStack = (projectRoot: string): DetectedStack => {
   const pkg = readPackageJson(projectRoot)
   const deps = collectDependencies(pkg)
 
