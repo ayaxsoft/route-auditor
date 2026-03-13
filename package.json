@@ -1,22 +1,41 @@
 {
-    "name": "route-auditor-monorepo",
-    "private": true,
-    "scripts": {
-      "dev": "pnpm --filter web dev",
-      "build": "pnpm -r build",
-      "build:cli": "pnpm --filter cli build",
-      "build:web": "pnpm --filter web build",
-      "test": "pnpm --filter cli test",
-      "lint": "pnpm -r lint",
-      "typecheck": "pnpm -r typecheck",
-      "clean": "pnpm -r clean"
-    },
-    "devDependencies": {
-      "typescript": "latest",
-      "prettier": "latest"
-    },
-    "engines": {
-      "node": ">=22.0.0",
-      "pnpm": ">=9.0.0"
-    }
+  "name": "route-auditor-monorepo",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "build": "pnpm -r build",
+    "build:cli": "pnpm --filter cli build",
+    "build:web": "pnpm --filter web build",
+    "test": "pnpm --filter cli test",
+    "lint": "eslint packages/",
+    "lint:fix": "eslint packages/ --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "pnpm -r typecheck",
+    "clean": "pnpm -r clean",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@eslint/js": "latest",
+    "eslint": "latest",
+    "eslint-config-prettier": "latest",
+    "husky": "latest",
+    "lint-staged": "latest",
+    "prettier": "latest",
+    "typescript": "latest",
+    "typescript-eslint": "latest"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yaml,yml}": [
+      "prettier --write"
+    ]
+  },
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=9.0.0"
   }
+}

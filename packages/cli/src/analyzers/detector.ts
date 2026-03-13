@@ -14,7 +14,7 @@ const AUTH_MAP: Record<string, DetectedStack['auth']> = {
   'better-auth': 'better-auth',
   '@clerk/nextjs': 'clerk',
   '@clerk/clerk-sdk-node': 'clerk',
-  'lucia': 'lucia',
+  lucia: 'lucia',
   'next-auth': 'next-auth',
   '@auth/nextjs': 'auth-js',
   '@supabase/ssr': 'supabase',
@@ -24,55 +24,55 @@ const AUTH_MAP: Record<string, DetectedStack['auth']> = {
 const ORM_MAP: Record<string, DetectedStack['orm']> = {
   '@prisma/client': 'prisma',
   'drizzle-orm': 'drizzle',
-  'mongoose': 'mongoose',
-  'pg': 'raw',
-  'mysql2': 'raw',
+  mongoose: 'mongoose',
+  pg: 'raw',
+  mysql2: 'raw',
   'better-sqlite3': 'raw',
 }
 
 const VALIDATION_MAP: Record<string, DetectedStack['validation']> = {
-  'zod': 'zod',
-  'yup': 'yup',
-  'joi': 'joi',
-  'valibot': 'valibot',
+  zod: 'zod',
+  yup: 'yup',
+  joi: 'joi',
+  valibot: 'valibot',
 }
 
 const EMAIL_MAP: Record<string, DetectedStack['email']> = {
-  'resend': 'resend',
-  'nodemailer': 'nodemailer',
-  'sendgrid': 'sendgrid',
+  resend: 'resend',
+  nodemailer: 'nodemailer',
+  sendgrid: 'sendgrid',
 }
 
 const RATE_LIMIT_MAP: Record<string, DetectedStack['rateLimit']> = {
   '@upstash/ratelimit': 'upstash',
-  'upstash': 'upstash',
+  upstash: 'upstash',
   'next-rate-limit': 'custom',
 }
 
 // --- Helper Functions ────────────────────────────────────────────────────────────
 function readPackageJson(projectRoot: string): Record<string, unknown> {
   try {
-    const raw = readFileSync(join(projectRoot, 'package.json'), 'utf8');
-    return JSON.parse(raw) as Record<string, unknown>;
-  }catch (error) {
+    const raw = readFileSync(join(projectRoot, 'package.json'), 'utf8')
+    return JSON.parse(raw) as Record<string, unknown>
+  } catch (_error) {
     return {}
   }
 }
 
 function collectDependencies(pkg: Record<string, unknown>): Set<string> {
-  const dependencies = new Set<string>();
-  const sections = ['dependencies', 'devDependencies', 'peerDependencies'];
+  const dependencies = new Set<string>()
+  const sections = ['dependencies', 'devDependencies', 'peerDependencies']
 
   for (const section of sections) {
-    const block = pkg[section];
+    const block = pkg[section]
     if (block && typeof block === 'object') {
       for (const name of Object.keys(block)) {
-        dependencies.add(name);
+        dependencies.add(name)
       }
     }
   }
 
-  return dependencies;
+  return dependencies
 }
 
 function detect<T>(deps: Set<string>, map: Record<string, T>): T | undefined {
@@ -83,14 +83,14 @@ function detect<T>(deps: Set<string>, map: Record<string, T>): T | undefined {
 }
 
 export function detectStack(projectRoot: string): DetectedStack {
-  const pkg = readPackageJson(projectRoot);
-  const deps = collectDependencies(pkg);
+  const pkg = readPackageJson(projectRoot)
+  const deps = collectDependencies(pkg)
 
-  const auth = detect(deps, AUTH_MAP);
-  const orm = detect(deps, ORM_MAP);
-  const validation = detect(deps, VALIDATION_MAP);
-  const email = detect(deps, EMAIL_MAP);
-  const rateLimit = detect(deps, RATE_LIMIT_MAP);
+  const auth = detect(deps, AUTH_MAP)
+  const orm = detect(deps, ORM_MAP)
+  const validation = detect(deps, VALIDATION_MAP)
+  const email = detect(deps, EMAIL_MAP)
+  const rateLimit = detect(deps, RATE_LIMIT_MAP)
 
-  return { auth, orm, validation, email, rateLimit };
+  return { auth, orm, validation, email, rateLimit }
 }

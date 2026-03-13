@@ -24,10 +24,7 @@ import { reportCommand } from './commands/report'
 
 const program = new Command()
 
-program
-  .name('route-auditor')
-  .description('Security auditor for Next.js routes')
-  .version('1.0.0')
+program.name('route-auditor').description('Security auditor for Next.js routes').version('1.0.0')
 
 program.addCommand(auditCommand)
 program.addCommand(initCommand)

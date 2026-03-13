@@ -15,15 +15,7 @@ export type VulnerabilityCategory =
 
 export type RouterType = 'app' | 'pages' | 'mixed'
 
-export type HttpMethod =
-  | 'GET'
-  | 'POST'
-  | 'PUT'
-  | 'PATCH'
-  | 'DELETE'
-  | 'HEAD'
-  | 'OPTIONS'
-  | 'ALL' // Pages Router sin req.method check
+export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'HEAD' | 'OPTIONS' | 'ALL' // Pages Router sin req.method check
 
 // ─── Detected stack ──────────────────────────────────────────────────────────
 
@@ -38,17 +30,17 @@ export interface DetectedStack {
 // ─── Next.js route ──────────────────────────────────────────────────────────
 
 export interface RouteFile {
-  filePath: string             // absolute file path on disk
-  routePath: string            // URL: /api/users/[id]
+  filePath: string // absolute file path on disk
+  routePath: string // URL: /api/users/[id]
   routerType: RouterType
   isApiRoute: boolean
   isDynamic: boolean
-  dynamicSegments: string[]    // ['id'] para /api/users/[id]
-  hasCatchAll: boolean         // true if it has [...slug]
+  dynamicSegments: string[] // ['id'] para /api/users/[id]
+  hasCatchAll: boolean // true if it has [...slug]
   hasOptionalCatchAll: boolean // true if it has [[...slug]]
   methods: HttpMethod[]
   exports: string[]
-  rawContent: string           // raw content — used by rules
+  rawContent: string // raw content — used by rules
 }
 
 // ─── Suggested fix ─────────────────────────────────────────────────────────────
@@ -56,20 +48,20 @@ export interface RouteFile {
 export interface Fix {
   description: string
   effort: 'trivial' | 'low' | 'medium' | 'high'
-  codeExample?: string  // specific code for the project's stack
-  docs?: string         // URL to relevant documentation
+  codeExample?: string // specific code for the project's stack
+  docs?: string // URL to relevant documentation
 }
 
 // ─── Vulnerability ───────────────────────────────────────────────────────────
 
 export interface Vulnerability {
-  id: string             // RW-AUTH-001
+  id: string // RW-AUTH-001
   title: string
   description: string
   severity: Severity
   category: VulnerabilityCategory
-  cwe?: string           // Common Weakness Enumeration
-  owasp?: string         // A01:2021 – Broken Access Control
+  cwe?: string // Common Weakness Enumeration
+  owasp?: string // A01:2021 – Broken Access Control
   filePath: string
   routePath: string
   line?: number
@@ -82,11 +74,11 @@ export interface Vulnerability {
 
 export interface AuditConfig {
   rules?: Record<string, boolean | { severity?: Severity }>
-  ignore?: string[]       // glob patterns of routes to ignore
-  severity?: Severity     // minimum severity to report
+  ignore?: string[] // glob patterns of routes to ignore
+  severity?: Severity // minimum severity to report
   output?: 'console' | 'json' | 'sarif'
   outputFile?: string
-  failOn?: Severity       // exit code 1 if there are vulnerabilities of this severity or higher
+  failOn?: Severity // exit code 1 if there are vulnerabilities of this severity or higher
 }
 
 // ─── Context that receives each rule ───────────────────────────────────────────
@@ -97,7 +89,7 @@ export interface AuditContext {
   nextVersion?: string
   detectedStack: DetectedStack
   config: AuditConfig
-  allRoutes: RouteFile[]  // all routes — for rules that need global context
+  allRoutes: RouteFile[] // all routes — for rules that need global context
 }
 
 // ─── Audit rule ───────────────────────────────────────────────────────
@@ -106,7 +98,7 @@ export interface AuditRule {
   id: string
   name: string
   description: string
-  severity: Severity      // base severity — can be dynamic within check()
+  severity: Severity // base severity — can be dynamic within check()
   category: VulnerabilityCategory
   enabled: boolean
   check(route: RouteFile, context: AuditContext): Vulnerability[]
@@ -120,7 +112,7 @@ export interface AuditSummary {
   totalVulnerabilities: number
   bySeverity: Record<Severity, number>
   byCategory: Partial<Record<VulnerabilityCategory, number>>
-  score: number           // 0-100, higher is better
+  score: number // 0-100, higher is better
 }
 
 export interface AuditResult {
@@ -128,9 +120,9 @@ export interface AuditResult {
   nextVersion?: string
   routerType: RouterType
   detectedStack: DetectedStack
-  scannedAt: string       // ISO timestamp
+  scannedAt: string // ISO timestamp
   routes: RouteFile[]
   vulnerabilities: Vulnerability[]
   summary: AuditSummary
-  duration: number        // milliseconds
+  duration: number // milliseconds
 }
