@@ -1,6 +1,6 @@
 {
   "name": "@route-auditor/cli",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Security auditor for Next.js routes — App Router, Pages Router, API Routes",
   "keywords": [
     "nextjs",
