@@ -1,5 +1,11 @@
 # @route-auditor/cli
 
+## 0.1.4
+
+### Patch Changes
+
+- 2ecd7ef: Fix crash when running CLI via npx — replace `createRequire(import.meta.url)` with a build-time constant injected by tsup, which works in both CJS and ESM bundles.
+
 ## 0.1.3
 
 ### Patch Changes
