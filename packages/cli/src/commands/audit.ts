@@ -1,37 +1,111 @@
-import { Command } from 'commander'
+import type { AuditConfig, Severity } from '../types'
+import { Command, Option } from 'commander'
 import { resolve } from 'path'
-import { scanRoutes } from '../analyzers/scanner'
+import { writeFileSync, readFileSync, existsSync } from 'fs'
+import ora from 'ora'
+import { runAudit } from '../analyzers/engine'
+import { ALL_RULES } from '../rules'
+import { renderHeader, renderConsoleReport } from '../reporters/console'
+import { renderJsonReport } from '../reporters/json'
+import { renderSarifReport } from '../reporters/sarif'
+
+const SEVERITY_ORDER: Severity[] = ['critical', 'high', 'medium', 'low', 'info']
+
+const meetsFailThreshold = (severity: Severity, failOn: Severity): boolean =>
+  SEVERITY_ORDER.indexOf(severity) <= SEVERITY_ORDER.indexOf(failOn)
+
+const loadConfigFile = (configPath: string): AuditConfig => {
+  if (!existsSync(configPath)) {
+    console.error(`Config file not found: ${configPath}`)
+    process.exit(1)
+  }
+  return JSON.parse(readFileSync(configPath, 'utf-8')) as AuditConfig
+}
+
+interface AuditOptions {
+  output: 'console' | 'json' | 'sarif'
+  severity: Severity
+  failOn?: Severity
+  file?: string
+  config?: string
+}
 
 export const auditCommand = new Command('audit')
   .description('Audit Next.js routes for security vulnerabilities')
   .argument('[directory]', 'Path to Next.js project root', '.')
-  .option('-o, --output <format>', 'Output format: console, json, sarif', 'console')
-  .option(
-    '-s, --severity <level>',
-    'Minimum severity to report: critical, high, medium, low, info',
-    'info',
+  .addOption(
+    new Option('-o, --output <format>', 'Output format')
+      .choices(['console', 'json', 'sarif'])
+      .default('console'),
   )
-  .option(
-    '--fail-on <level>',
-    'Exit with code 1 if vulnerabilities of this level or higher are found',
+  .addOption(
+    new Option('-s, --severity <level>', 'Minimum severity to report')
+      .choices(['critical', 'high', 'medium', 'low', 'info'])
+      .default('info'),
+  )
+  .addOption(
+    new Option(
+      '--fail-on <level>',
+      'Exit with code 1 if vulnerabilities of this level or higher are found',
+    ).choices(['critical', 'high', 'medium', 'low', 'info']),
   )
   .option('--file <path>', 'Write output to file instead of stdout')
   .option('--config <path>', 'Path to route-auditor.config.json')
-  .action(async (directory: string) => {
+  .action(async (directory: string, options: AuditOptions) => {
     const projectRoot = resolve(directory)
-    const routes = await scanRoutes(projectRoot)
 
-    const routesByApp = Map.groupBy(routes, (route) => route.projectRoot)
+    const fileConfig: AuditConfig = options.config ? loadConfigFile(resolve(options.config)) : {}
 
-    console.log(`Found ${routes.length} routes across ${routesByApp.size} app(s)\n`)
+    const config: AuditConfig = {
+      ...fileConfig,
+      severity: options.severity ?? fileConfig.severity ?? 'info',
+      output: options.output ?? fileConfig.output ?? 'console',
+      outputFile: options.file ?? fileConfig.outputFile,
+      failOn: options.failOn ?? fileConfig.failOn,
+    }
 
-    for (const [appRoot, appRoutes] of routesByApp) {
-      console.log(`  ${appRoot}`)
-      for (const route of appRoutes) {
-        console.log(
-          `    ${route.routerType.padEnd(6)} ${route.isApiRoute ? '[API] ' : '[page]'} ${route.routePath}`,
-        )
-      }
+    const isConsoleOutput = config.output === 'console' && !config.outputFile
+
+    if (isConsoleOutput) {
+      renderHeader()
       console.log()
+    }
+
+    const spinner = isConsoleOutput ? ora('Scanning routes...').start() : null
+
+    let result
+    try {
+      result = await runAudit(projectRoot, config)
+      spinner?.succeed(`Scanned ${result.routes.length} routes in ${result.duration}ms`)
+    } catch (error) {
+      spinner?.fail(error instanceof Error ? error.message : 'Audit failed')
+      process.exit(1)
+    }
+
+    const output = config.output ?? 'console'
+
+    let rendered: string | null = null
+    if (output === 'json') {
+      rendered = renderJsonReport(result)
+    } else if (output === 'sarif') {
+      rendered = renderSarifReport(result, ALL_RULES)
+    } else {
+      renderConsoleReport(result)
+    }
+
+    if (rendered !== null) {
+      if (config.outputFile) {
+        writeFileSync(resolve(config.outputFile), rendered, 'utf-8')
+        console.log(`Output written to ${config.outputFile}`)
+      } else {
+        console.log(rendered)
+      }
+    }
+
+    if (config.failOn) {
+      const shouldFail = result.vulnerabilities.some((vulnerability) =>
+        meetsFailThreshold(vulnerability.severity, config.failOn!),
+      )
+      if (shouldFail) process.exit(1)
     }
   })
