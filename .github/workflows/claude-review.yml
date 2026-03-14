@@ -2,7 +2,7 @@ name: Claude - Review
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: [master]
     types: [opened, synchronize]
 
 permissions:
@@ -14,7 +14,7 @@ permissions:
 concurrency:
   group: 'claude-review-${{ github.event.pull_request.number }}'
   cancel-in-progress: true
-  
+
 jobs:
   review:
     runs-on: ubuntu-24.04 # you can specify your own runner
@@ -30,7 +30,7 @@ jobs:
           prompt: |
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
-            
+
             Perform a comprehensive code review using .github/copilot-instructions.md
             Use inline comments only for concrete suggestions or potential
             issues. Do NOT leave inline comments that merely confirm correct
@@ -43,7 +43,7 @@ jobs:
             IMPORTANT: Use the provided MCP tools (mcp__github_comment,
             mcp__github_inline_comment) for posting comments. Do NOT use curl,
             python, or other HTTP tools to call the GitHub API directly.
-            
+
             IMPORTANT: If you encounter a permission denial for a tool you need,
             create a GitHub issue with the label "claude-permissions" titled
             "Claude Code Review: missing permission for <tool-name>" describing
