@@ -46,21 +46,21 @@ Audit Next.js routes for security issues.
 
 ## Commands
 
-| Command | Description |
-| --- | --- |
-| `audit [dir]` | Scan a Next.js project for security vulnerabilities |
-| `init` | Generate a `route-auditor.config.json` config file |
-| `report <file>` | Re-render a saved JSON audit in any output format |
+| Command         | Description                                         |
+| --------------- | --------------------------------------------------- |
+| `audit [dir]`   | Scan a Next.js project for security vulnerabilities |
+| `init`          | Generate a `route-auditor.config.json` config file  |
+| `report <file>` | Re-render a saved JSON audit in any output format   |
 
 ## Audit Options
 
-| Option | Description | Default |
-| --- | --- | --- |
-| `-o, --output <format>` | Output format: `console`, `json`, `sarif` | `console` |
-| `-s, --severity <level>` | Minimum severity: `critical` `high` `medium` `low` `info` | `info` |
-| `--fail-on <level>` | Exit code 1 if issues at or above this severity | — |
-| `--file <path>` | Write output to file instead of stdout | — |
-| `--config <path>` | Path to config file | — |
+| Option                   | Description                                               | Default   |
+| ------------------------ | --------------------------------------------------------- | --------- |
+| `-o, --output <format>`  | Output format: `console`, `json`, `sarif`                 | `console` |
+| `-s, --severity <level>` | Minimum severity: `critical` `high` `medium` `low` `info` | `info`    |
+| `--fail-on <level>`      | Exit code 1 if issues at or above this severity           | —         |
+| `--file <path>`          | Write output to file instead of stdout                    | —         |
+| `--config <path>`        | Path to config file                                       | —         |
 
 ## Rules
 
