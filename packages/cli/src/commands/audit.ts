@@ -1,7 +1,8 @@
 import type { AuditConfig, Severity } from '../types'
 import { Command, Option } from 'commander'
 import { resolve } from 'path'
-import { writeFileSync, readFileSync, existsSync } from 'fs'
+import { writeFileSync, readFileSync, existsSync, statSync } from 'fs'
+import chalk from 'chalk'
 import ora from 'ora'
 import { runAudit } from '../analyzers/engine'
 import { ALL_RULES } from '../rules'
@@ -54,7 +55,18 @@ export const auditCommand = new Command('audit')
   .action(async (directory: string, options: AuditOptions) => {
     const projectRoot = resolve(directory)
 
-    const fileConfig: AuditConfig = options.config ? loadConfigFile(resolve(options.config)) : {}
+    if (!existsSync(projectRoot) || !statSync(projectRoot).isDirectory()) {
+      console.error(`\n  ${chalk.red('✗')} Directory not found: ${chalk.bold(projectRoot)}\n`)
+      process.exit(1)
+    }
+
+    const configPath = options.config
+      ? resolve(options.config)
+      : existsSync(resolve(projectRoot, 'route-auditor.config.json'))
+        ? resolve(projectRoot, 'route-auditor.config.json')
+        : null
+
+    const fileConfig: AuditConfig = configPath ? loadConfigFile(configPath) : {}
 
     const config: AuditConfig = {
       ...fileConfig,
@@ -76,7 +88,11 @@ export const auditCommand = new Command('audit')
     let result
     try {
       result = await runAudit(projectRoot, config)
-      spinner?.succeed(`Scanned ${result.routes.length} routes in ${result.duration}ms`)
+      if (result.routes.length === 0) {
+        spinner?.warn('No routes found — is this a Next.js project?')
+      } else {
+        spinner?.succeed(`Scanned ${result.routes.length} routes in ${result.duration}ms`)
+      }
     } catch (error) {
       spinner?.fail(error instanceof Error ? error.message : 'Audit failed')
       process.exit(1)

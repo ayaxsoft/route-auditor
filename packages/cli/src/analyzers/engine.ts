@@ -68,6 +68,20 @@ const isRuleEnabled = (ruleId: string, config: AuditConfig): boolean => {
   return true
 }
 
+const isIgnored = (routePath: string, ignorePatterns: string[]): boolean =>
+  ignorePatterns.some((innerPattern) => {
+    if (innerPattern.endsWith('/**')) {
+      const prefix = innerPattern.slice(0, -3)
+      return routePath === prefix || routePath.startsWith(prefix + '/')
+    }
+    if (innerPattern.endsWith('/*')) {
+      const prefix = innerPattern.slice(0, -2)
+      const remainder = routePath.slice(prefix.length + 1)
+      return routePath.startsWith(prefix + '/') && !remainder.includes('/')
+    }
+    return routePath === innerPattern
+  })
+
 const meetsMinimumSeverity = (severity: Severity, minimumSeverity: Severity): boolean => {
   return SEVERITY_ORDER.indexOf(severity) <= SEVERITY_ORDER.indexOf(minimumSeverity)
 }
@@ -94,11 +108,17 @@ export const runAudit = async (
     allRoutes: routes,
   }
 
+  const ignorePatterns = config.ignore ?? []
+
+  const auditableRoutes = ignorePatterns.length > 0
+    ? routes.filter((innerRoute) => !isIgnored(innerRoute.routePath, ignorePatterns))
+    : routes
+
   const enabledRules = ALL_RULES.filter(
     (innerRule) => innerRule.enabled && isRuleEnabled(innerRule.id, config),
   )
 
-  const allVulnerabilities = routes.flatMap((innerRoute) =>
+  const allVulnerabilities = auditableRoutes.flatMap((innerRoute) =>
     enabledRules.flatMap((innerRule) => innerRule.check(innerRoute, context)),
   )
 

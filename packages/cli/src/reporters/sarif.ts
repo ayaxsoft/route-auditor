@@ -1,4 +1,9 @@
 import type { AuditResult, AuditRule, Vulnerability } from '../types'
+import { createRequire } from 'module'
+
+const require = createRequire(import.meta.url)
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { version } = require('../../package.json') as { version: string }
 
 interface SarifLocation {
   physicalLocation: {
@@ -71,7 +76,7 @@ export const renderSarifReport = (result: AuditResult, rules: AuditRule[]): stri
         tool: {
           driver: {
             name: 'route-auditor',
-            version: '0.0.1',
+            version,
             informationUri: 'https://github.com/drbarzaga/route-auditor',
             rules: rules.map(ruleToSarifRule),
           },
