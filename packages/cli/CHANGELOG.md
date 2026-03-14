@@ -1,5 +1,11 @@
 # @route-auditor/cli
 
+## 0.1.3
+
+### Patch Changes
+
+- 21a1032: Fix table formatting in README — shorter columns to prevent wrapping on GitHub and npm.
+
 ## 0.1.2
 
 ### Patch Changes
