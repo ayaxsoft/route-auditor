@@ -1,5 +1,12 @@
 # @route-auditor/cli
 
+## 0.1.2
+
+### Patch Changes
+
+- c92e964: Fix table formatting in README — shorter columns to prevent wrapping on GitHub and npm.
+- 6f21a39: Fix npm install failure — move `@route-auditor/shared` to devDependencies since tsup bundles it into the dist. Prevents E404 when installing the CLI in external projects.
+
 ## 0.1.1
 
 ### Patch Changes

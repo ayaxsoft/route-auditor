@@ -32,9 +32,6 @@ importers:
 
   packages/cli:
     dependencies:
-      '@route-auditor/shared':
-        specifier: workspace:*
-        version: link:../shared
       boxen:
         specifier: latest
         version: 8.0.1
@@ -54,6 +51,9 @@ importers:
         specifier: latest
         version: 4.3.6
     devDependencies:
+      '@route-auditor/shared':
+        specifier: workspace:*
+        version: link:../shared
       '@types/node':
         specifier: latest
         version: 25.5.0
