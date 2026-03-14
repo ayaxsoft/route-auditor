@@ -46,21 +46,21 @@ Audit Next.js routes for security issues.
 
 ## Commands
 
-| Command                       | Description                                         |
-| ----------------------------- | --------------------------------------------------- |
-| `route-auditor audit [dir]`   | Scan a Next.js project for security vulnerabilities |
-| `route-auditor init`          | Generate a `route-auditor.config.json` config file  |
-| `route-auditor report <file>` | Re-render a saved JSON audit in any output format   |
+| Command         | Description                                         |
+| --------------- | --------------------------------------------------- |
+| `audit [dir]`   | Scan a Next.js project for security vulnerabilities |
+| `init`          | Generate a `route-auditor.config.json` config file  |
+| `report <file>` | Re-render a saved JSON audit in any output format   |
 
 ## Audit Options
 
-| Option                   | Description                                                              | Default   |
-| ------------------------ | ------------------------------------------------------------------------ | --------- |
-| `-o, --output <format>`  | Output format: `console`, `json`, `sarif`                                | `console` |
-| `-s, --severity <level>` | Minimum severity to display: `critical`, `high`, `medium`, `low`, `info` | `info`    |
-| `--fail-on <level>`      | Exit with code 1 if issues at this severity or higher are found          | —         |
-| `--file <path>`          | Write output to a file instead of stdout                                 | —         |
-| `--config <path>`        | Path to a custom `route-auditor.config.json`                             | —         |
+| Option                   | Description                                               | Default   |
+| ------------------------ | --------------------------------------------------------- | --------- |
+| `-o, --output <format>`  | Output format: `console`, `json`, `sarif`                 | `console` |
+| `-s, --severity <level>` | Minimum severity: `critical` `high` `medium` `low` `info` | `info`    |
+| `--fail-on <level>`      | Exit code 1 if issues at or above this severity           | —         |
+| `--file <path>`          | Write output to file instead of stdout                    | —         |
+| `--config <path>`        | Path to config file                                       | —         |
 
 ## Rules
 
