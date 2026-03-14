@@ -33,7 +33,6 @@
     "release": "pnpm build && npm publish --access public"
   },
   "dependencies": {
-    "@route-auditor/shared": "workspace:*",
     "commander": "latest",
     "chalk": "latest",
     "ora": "latest",
@@ -42,6 +41,7 @@
     "zod": "latest"
   },
   "devDependencies": {
+    "@route-auditor/shared": "workspace:*",
     "@types/node": "latest",
     "@vitest/coverage-v8": "latest",
     "tsup": "latest",
