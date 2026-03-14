@@ -1,5 +1,12 @@
 # @route-auditor/cli
 
+## 0.1.5
+
+### Patch Changes
+
+- 88ab222: GitHub Action now posts audit results as a PR comment instead of blocking — updates existing comment on re-runs, supports optional `fail-on` threshold.
+- 88ab222: Fix crash when running CLI via npx — replace `createRequire(import.meta.url)` with a build-time constant injected by tsup, which works in both CJS and ESM bundles.
+
 ## 0.1.4
 
 ### Patch Changes
