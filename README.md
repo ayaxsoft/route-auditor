@@ -46,6 +46,58 @@ Audit Next.js routes for security issues.
 
 ## CI Integration
 
+### GitHub Action
+
+Add to `.github/workflows/route-auditor.yml` in your repository:
+
+```yaml
+name: Route Auditor
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ayaxsoft/route-auditor@v1
+        with:
+          fail-on: high
+```
+
+The action automatically posts audit results as a PR comment and updates it on each push.
+
+#### With SARIF upload (GitHub Code Scanning)
+
+```yaml
+steps:
+  - uses: actions/checkout@v4
+  - uses: ayaxsoft/route-auditor@v1
+    with:
+      sarif-file: results.sarif
+      fail-on: high
+  - uses: github/codeql-action/upload-sarif@v3
+    if: always()
+    with:
+      sarif_file: results.sarif
+```
+
+#### Action inputs
+
+| Input        | Description                                         | Default  |
+| ------------ | --------------------------------------------------- | -------- |
+| `directory`  | Path to the Next.js project to audit                | `.`      |
+| `severity`   | Minimum severity to report                          | `info`   |
+| `fail-on`    | Fail if issues at this severity or higher are found | —        |
+| `sarif-file` | Write SARIF output to this file path                | —        |
+| `config`     | Path to `route-auditor.config.json`                 | —        |
+| `version`    | Version of `@route-auditor/cli` to use              | `latest` |
+
+### CLI
+
 ```bash
 # Fail the pipeline if any high or critical vulnerabilities are found
 route-auditor audit . --fail-on high
