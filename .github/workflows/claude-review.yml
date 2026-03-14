@@ -35,22 +35,5 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-
-          # Optional: Customize the trigger phrase (default: @claude)
-          # trigger_phrase: "/claude"
-
-          # Optional: Trigger when specific user is assigned to an issue
-          # assignee_trigger: "claude-bot"
-
-          # Optional: Configure Claude's behavior with CLI arguments
           claude_args: |
-            --allowedTools "Bash(git diff:*),Bash(git log:*),Bash(git status:*),Bash(pnpm install),Bash(pnpm test),Bash(pnpm lint),Bash(pnpm typecheck),Bash(pnpm build:cli)"
-            --system-prompt "Follow the coding standards defined in AGENTS.md."
-
-          # Optional: Advanced settings configuration
-          # settings: |
-          #   {
-          #     "env": {
-          #       "NODE_ENV": "test"
-          #     }
-          #   }
+            --allowedTools Bash(git diff:*),Bash(git log:*),Bash(git status:*),Bash(pnpm install),Bash(pnpm test),Bash(pnpm lint),Bash(pnpm typecheck),Bash(pnpm build:cli)
