@@ -1,9 +1,7 @@
 import type { AuditResult, AuditRule, Vulnerability } from '../types'
-import { createRequire } from 'module'
 
-const require = createRequire(import.meta.url)
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const { version } = require('../../package.json') as { version: string }
+declare const __PACKAGE_VERSION__: string
+const version = __PACKAGE_VERSION__
 
 interface SarifLocation {
   physicalLocation: {
