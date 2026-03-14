@@ -1,9 +1,10 @@
 name: Security Audit (example)
 # This workflow shows how to use the route-auditor GitHub Action.
-# It only runs manually — copy the steps into your own project's workflow.
+# Copy the steps into your own project's workflow.
 
 on:
   workflow_dispatch:
+  pull_request:
 
 jobs:
   audit:
@@ -11,27 +12,26 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      security-events: write
+      pull-requests: write   # required to post PR comments
+      security-events: write # required for SARIF upload
 
     steps:
       - uses: actions/checkout@v4
 
-      # Option A — basic, fail if high or critical issues are found
+      # Posts audit results as a PR comment, never blocks the PR
       - name: Audit routes
         uses: ayaxsoft/route-auditor@v1
         with:
           directory: .
-          fail-on: high
 
-      # Option B — generate SARIF and upload to GitHub Code Scanning
+      # Optional — also upload SARIF to GitHub Code Scanning
       - name: Audit routes (SARIF)
-        if: always()
         uses: ayaxsoft/route-auditor@v1
         with:
           directory: .
           sarif-file: results.sarif
 
-      - name: Upload SARIF to GitHub Code Scanning
+      - name: Upload SARIF
         uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:

@@ -16,13 +16,9 @@ inputs:
     required: false
     default: 'info'
   fail-on:
-    description: 'Exit with code 1 if issues at this severity or higher are found'
+    description: 'Exit with code 1 if issues at this severity or higher are found (optional)'
     required: false
     default: ''
-  output:
-    description: 'Output format: console, json, sarif'
-    required: false
-    default: 'console'
   sarif-file:
     description: Write SARIF output to this file path (e.g. results.sarif)
     required: false
@@ -35,6 +31,10 @@ inputs:
     description: Version of @route-auditor/cli to use
     required: false
     default: 'latest'
+  token:
+    description: GitHub token used to post PR comments (defaults to github.token)
+    required: false
+    default: ${{ github.token }}
 
 outputs:
   sarif-file:
@@ -59,10 +59,6 @@ runs:
           ARGS="$ARGS --severity ${{ inputs.severity }}"
         fi
 
-        if [ -n "${{ inputs.fail-on }}" ]; then
-          ARGS="$ARGS --fail-on ${{ inputs.fail-on }}"
-        fi
-
         if [ -n "${{ inputs.config }}" ]; then
           ARGS="$ARGS --config ${{ inputs.config }}"
         fi
@@ -70,8 +66,69 @@ runs:
         if [ -n "${{ inputs.sarif-file }}" ]; then
           ARGS="$ARGS --output sarif --file ${{ inputs.sarif-file }}"
           echo "sarif-file=${{ inputs.sarif-file }}" >> $GITHUB_OUTPUT
-        elif [ "${{ inputs.output }}" != "console" ]; then
-          ARGS="$ARGS --output ${{ inputs.output }}"
         fi
 
-        npx @route-auditor/cli@${{ inputs.version }} audit $ARGS
+        # Run audit, capture output, never fail here
+        npx @route-auditor/cli@${{ inputs.version }} audit $ARGS > /tmp/route-audit-output.txt 2>&1 || true
+
+        # Store exit code separately for fail-on logic
+        npx @route-auditor/cli@${{ inputs.version }} audit $ARGS --output json 2>/dev/null > /tmp/route-audit-result.json || EXIT_CODE=$?
+        echo "exit-code=${EXIT_CODE:-0}" >> $GITHUB_OUTPUT
+
+    - name: Post PR comment
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ inputs.token }}
+        script: |
+          const fs = require('fs')
+          const output = fs.readFileSync('/tmp/route-audit-output.txt', 'utf8').trim()
+
+          const MARKER = '<!-- route-auditor-report -->'
+          const body = `${MARKER}
+          ## 🔍 Route Auditor
+
+          <details open>
+          <summary>Audit results for <code>${{ inputs.directory }}</code></summary>
+
+          \`\`\`
+          ${output}
+          \`\`\`
+
+          </details>
+
+          > Powered by [route-auditor](https://github.com/ayaxsoft/route-auditor)`
+
+          // Find existing comment and update, or create new
+          const { data: comments } = await github.rest.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+          })
+
+          const existing = comments.find(c => c.body.includes(MARKER))
+
+          if (existing) {
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: existing.id,
+              body,
+            })
+          } else {
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body,
+            })
+          }
+
+    - name: Fail if fail-on threshold exceeded
+      if: inputs.fail-on != ''
+      shell: bash
+      run: |
+        npx @route-auditor/cli@${{ inputs.version }} audit ${{ inputs.directory }} \
+          --severity ${{ inputs.fail-on }} \
+          --fail-on ${{ inputs.fail-on }} \
+          ${{ inputs.config != '' && format('--config {0}', inputs.config) || '' }}
