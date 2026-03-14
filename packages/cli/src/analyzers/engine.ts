@@ -110,9 +110,10 @@ export const runAudit = async (
 
   const ignorePatterns = config.ignore ?? []
 
-  const auditableRoutes = ignorePatterns.length > 0
-    ? routes.filter((innerRoute) => !isIgnored(innerRoute.routePath, ignorePatterns))
-    : routes
+  const auditableRoutes =
+    ignorePatterns.length > 0
+      ? routes.filter((innerRoute) => !isIgnored(innerRoute.routePath, ignorePatterns))
+      : routes
 
   const enabledRules = ALL_RULES.filter(
     (innerRule) => innerRule.enabled && isRuleEnabled(innerRule.id, config),

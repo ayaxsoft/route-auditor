@@ -34,7 +34,9 @@ export const reportCommand = new Command('report')
     try {
       result = JSON.parse(readFileSync(inputPath, 'utf-8')) as AuditResult
     } catch {
-      console.error(`\n  ${chalk.red('✗')} Failed to parse ${chalk.bold(jsonFile)} — is it a valid audit JSON?\n`)
+      console.error(
+        `\n  ${chalk.red('✗')} Failed to parse ${chalk.bold(jsonFile)} — is it a valid audit JSON?\n`,
+      )
       process.exit(1)
     }
 
@@ -45,9 +47,8 @@ export const reportCommand = new Command('report')
       return
     }
 
-    const rendered = options.output === 'sarif'
-      ? renderSarifReport(result, ALL_RULES)
-      : renderJsonReport(result)
+    const rendered =
+      options.output === 'sarif' ? renderSarifReport(result, ALL_RULES) : renderJsonReport(result)
 
     if (options.file) {
       writeFileSync(resolve(options.file), rendered, 'utf-8')
