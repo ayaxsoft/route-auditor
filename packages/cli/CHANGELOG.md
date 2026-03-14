@@ -1,5 +1,11 @@
 # @route-auditor/cli
 
+## 0.1.1
+
+### Patch Changes
+
+- Add npm README with full documentation — commands table, all 8 rules, CI integration examples, configuration reference, and ignore patterns guide.
+
 ## 0.1.0
 
 ### Minor Changes
