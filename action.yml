@@ -1,0 +1,77 @@
+name: Route Auditor
+description: Scan Next.js routes for security vulnerabilities — App Router, Pages Router, and API Routes.
+author: ayaxsoft
+
+branding:
+  icon: shield
+  color: red
+
+inputs:
+  directory:
+    description: Path to the Next.js project to audit
+    required: false
+    default: '.'
+  severity:
+    description: 'Minimum severity to report: critical, high, medium, low, info'
+    required: false
+    default: 'info'
+  fail-on:
+    description: 'Exit with code 1 if issues at this severity or higher are found'
+    required: false
+    default: ''
+  output:
+    description: 'Output format: console, json, sarif'
+    required: false
+    default: 'console'
+  sarif-file:
+    description: Write SARIF output to this file path (e.g. results.sarif)
+    required: false
+    default: ''
+  config:
+    description: Path to a route-auditor.config.json file
+    required: false
+    default: ''
+  version:
+    description: Version of @route-auditor/cli to use
+    required: false
+    default: 'latest'
+
+outputs:
+  sarif-file:
+    description: Path to the generated SARIF file (if sarif-file input was set)
+    value: ${{ steps.audit.outputs.sarif-file }}
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+
+    - name: Run route-auditor
+      id: audit
+      shell: bash
+      run: |
+        ARGS="${{ inputs.directory }}"
+
+        if [ -n "${{ inputs.severity }}" ]; then
+          ARGS="$ARGS --severity ${{ inputs.severity }}"
+        fi
+
+        if [ -n "${{ inputs.fail-on }}" ]; then
+          ARGS="$ARGS --fail-on ${{ inputs.fail-on }}"
+        fi
+
+        if [ -n "${{ inputs.config }}" ]; then
+          ARGS="$ARGS --config ${{ inputs.config }}"
+        fi
+
+        if [ -n "${{ inputs.sarif-file }}" ]; then
+          ARGS="$ARGS --output sarif --file ${{ inputs.sarif-file }}"
+          echo "sarif-file=${{ inputs.sarif-file }}" >> $GITHUB_OUTPUT
+        elif [ "${{ inputs.output }}" != "console" ]; then
+          ARGS="$ARGS --output ${{ inputs.output }}"
+        fi
+
+        npx @route-auditor/cli@${{ inputs.version }} audit $ARGS
