@@ -81,12 +81,18 @@ describe('runAudit', () => {
     const result = await runAudit('/project')
 
     expect(result.vulnerabilities).toHaveLength(1)
-    expect(rule.check).toHaveBeenCalledWith(routes[0], expect.objectContaining({ projectRoot: '/project' }))
+    expect(rule.check).toHaveBeenCalledWith(
+      routes[0],
+      expect.objectContaining({ projectRoot: '/project' }),
+    )
   })
 
   it('skips disabled rules', async () => {
     const routes = [buildRouteFile()]
-    const rule = buildRule({ enabled: false, check: vi.fn().mockReturnValue([buildVulnerability()]) })
+    const rule = buildRule({
+      enabled: false,
+      check: vi.fn().mockReturnValue([buildVulnerability()]),
+    })
 
     mockScanRoutes.mockResolvedValue(routes)
     vi.spyOn(rulesModule, 'ALL_RULES', 'get').mockReturnValue([rule])
@@ -164,7 +170,9 @@ describe('runAudit', () => {
 
     it('does not go below 0', async () => {
       const routes = [buildRouteFile()]
-      const criticalVulns = Array.from({ length: 10 }, () => buildVulnerability({ severity: 'critical' }))
+      const criticalVulns = Array.from({ length: 10 }, () =>
+        buildVulnerability({ severity: 'critical' }),
+      )
       const rule = buildRule({ check: vi.fn().mockReturnValue(criticalVulns) })
 
       mockScanRoutes.mockResolvedValue(routes)

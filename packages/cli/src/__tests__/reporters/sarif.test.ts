@@ -77,7 +77,9 @@ describe('renderSarifReport', () => {
 
       expect(sarifRule.id).toBe('RW-AUTH-001')
       expect(sarifRule.name).toBe('Unprotected API Route')
-      expect(sarifRule.shortDescription.text).toBe('API route does not appear to have authentication checks.')
+      expect(sarifRule.shortDescription.text).toBe(
+        'API route does not appear to have authentication checks.',
+      )
       expect(sarifRule.properties.tags).toContain('authentication')
     })
 

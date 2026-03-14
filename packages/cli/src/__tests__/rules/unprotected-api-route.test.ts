@@ -66,7 +66,9 @@ describe('unprotectedApiRoute', () => {
 
   describe('when stack auth is detected', () => {
     it('returns no vulnerabilities when next-auth signature is present', () => {
-      const route = buildRouteFile({ rawContent: 'const session = await getServerSession(authOptions)' })
+      const route = buildRouteFile({
+        rawContent: 'const session = await getServerSession(authOptions)',
+      })
       const context = buildContext({ detectedStack: { auth: 'next-auth' } })
       const result = unprotectedApiRoute.check(route, context)
       expect(result).toHaveLength(0)
@@ -87,7 +89,9 @@ describe('unprotectedApiRoute', () => {
     })
 
     it('returns vulnerability when stack is detected but signature is absent', () => {
-      const route = buildRouteFile({ rawContent: 'export async function GET() { return Response.json({}) }' })
+      const route = buildRouteFile({
+        rawContent: 'export async function GET() { return Response.json({}) }',
+      })
       const context = buildContext({ detectedStack: { auth: 'next-auth' } })
       const result = unprotectedApiRoute.check(route, context)
       expect(result).toHaveLength(1)
