@@ -20,7 +20,6 @@ const USER_INPUT_REDIRECT_PATTERNS = [
 
 const SAFE_REDIRECT_PATTERNS = [
   "startsWith('/')",
-  "startsWith('/')",
   'new URL(',
   'isValidUrl',
   'isAllowedUrl',

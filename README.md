@@ -126,7 +126,7 @@ route-auditor audit . --output sarif --file results.sarif
 Want to contribute? Check out the codebase and submit a PR.
 
 ```bash
-git clone https://github.com/drbarzaga/route-auditor
+git clone https://github.com/ayaxsoft/route-auditor
 cd route-auditor
 pnpm install
 pnpm build

@@ -15,7 +15,7 @@ describe('isNextjsProject', () => {
   })
 
   it('returns true when next.config.js exists', async () => {
-    mockAccess.mockResolvedValueOnce(undefined)
+    mockAccess.mockResolvedValue(undefined)
     expect(await isNextjsProject('/project')).toBe(true)
   })
 

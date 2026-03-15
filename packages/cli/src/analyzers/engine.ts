@@ -11,16 +11,7 @@ import type {
 import { scanRoutes } from './scanner'
 import { detectStack } from './detector'
 import { ALL_RULES } from '../rules'
-
-const SEVERITY_ORDER: Severity[] = ['critical', 'high', 'medium', 'low', 'info']
-
-const SEVERITY_PENALTY: Record<Severity, number> = {
-  critical: 25,
-  high: 15,
-  medium: 8,
-  low: 3,
-  info: 1,
-}
+import { SEVERITY_ORDER, SEVERITY_PENALTY } from '@route-auditor/shared'
 
 const deriveRouterType = (routerTypes: Set<RouterType>): RouterType => {
   if (routerTypes.has('app') && routerTypes.has('pages')) return 'mixed'
@@ -96,7 +87,7 @@ export const runAudit = async (
   const detectedStack = detectStack(projectRoot)
 
   const routerTypes = new Set(routes.map((innerRoute) => innerRoute.routerType))
-  const routerType = deriveRouterType(routerTypes as Set<RouterType>)
+  const routerType = deriveRouterType(routerTypes)
 
   const minimumSeverity = config.severity ?? 'info'
 

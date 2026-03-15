@@ -7,8 +7,7 @@
   - If the code is a hack (like a setTimeout or potentially confusing code), it must be prefixed with // HACK: reason for hack
 - MUST: Use kebab-case for files
 - MUST: Use descriptive names for variables (avoid shorthands, or 1-2 character names).
-  - Example: for .map(), you can use `innerX` instead of `x`
-  - Example: instead of `moved` use `didPositionChange`
+  - Example: for .map(), you can use `index` instead of `x`
 - MUST: Frequently re-evaluate and refactor variable names to be more accurate and descriptive.
 - MUST: Do not type cast ("as") unless absolutely necessary
 - MUST: Remove unused code and don't repeat yourself.
