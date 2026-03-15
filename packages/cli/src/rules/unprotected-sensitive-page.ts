@@ -87,20 +87,6 @@ const GENERIC_FIX: Fix = {
 const isSensitivePage = (routePath: string): boolean =>
   SENSITIVE_PATH_SEGMENTS.some((innerSegment) => routePath.toLowerCase().includes(innerSegment))
 
-// const hasAuthSignature = (rawContent: string, signatures: string[]): boolean =>
-//   signatures.some((innerSignature) => rawContent.includes(innerSignature))
-
-// const detectsAuth = (route: RouteFile, context: AuditContext): boolean => {
-//   const { detectedStack } = context
-
-//   if (detectedStack.auth) {
-//     const signatures = AUTH_SIGNATURES[detectedStack.auth]
-//     if (hasAuthSignature(route.rawContent, signatures)) return true
-//   }
-
-//   return hasAuthSignature(route.rawContent, GENERIC_AUTH_SIGNATURES)
-// }
-
 const buildFix = (detectedAuth: DetectedStack['auth']): Fix =>
   detectedAuth ? AUTH_FIX[detectedAuth] : GENERIC_FIX
 
