@@ -2,47 +2,69 @@
 
 Catch security issues in your Next.js routes before they reach production.
 
-## Installation
+Scans App Router, Pages Router, and API Routes — detecting missing authentication, CSRF gaps, permissive CORS, hardcoded secrets, and more. Stack-aware: fix suggestions are tailored to your detected auth library, validation library, and rate-limiting solution.
+
+## Quick Start
 
 ```bash
-npm install -g @route-auditor/cli
-```
-
-## Usage
-
-```bash
-route-auditor audit [directory]
+npx @route-auditor/cli audit .
 ```
 
 ```
 ⚡ route-auditor
 Audit Next.js routes for security issues.
 
-✔ Scanned 34 routes in 8ms
+  [HIGH] Unprotected API Route  ·  3 routes
+         OWASP A01:2021 – Broken Access Control
 
-  [HIGH] Unprotected API Route  3 routes
-         A01:2021 – Broken Access Control
-
-         → /api/users                          app/api/users/route.ts
-         → /api/posts/[id]                     app/api/posts/[id]/route.ts
+         → /api/users          app/api/users/route.ts
+         → /api/posts/[id]     app/api/posts/[id]/route.ts
 
          Fix: Use getServerSession(authOptions) to verify the session.  (low effort)
 
   85 / 100  Good
   █████████████████████████████████░░░░░░░
 
-  3 vulnerabilities  across 34 routes in 0.0s
+  3 vulnerabilities across 34 routes in 0.0s
 ```
 
-## Options
+## Commands
 
-| Option                   | Description                                                           | Default   |
-| ------------------------ | --------------------------------------------------------------------- | --------- |
-| `-o, --output <format>`  | Output format: `console`, `json`, `sarif`                             | `console` |
-| `-s, --severity <level>` | Minimum severity: `critical`, `high`, `medium`, `low`, `info`         | `info`    |
-| `--fail-on <level>`      | Exit with code 1 if vulnerabilities at this level or higher are found | —         |
-| `--file <path>`          | Write output to file instead of stdout                                | —         |
-| `--config <path>`        | Path to `route-auditor.config.json`                                   | —         |
+| Command         | Description                                         |
+| --------------- | --------------------------------------------------- |
+| `audit [dir]`   | Scan a Next.js project for security vulnerabilities |
+| `rules [dir]`   | List all rules with their enabled/disabled status   |
+| `rules disable` | Interactively select rules to disable               |
+| `rules enable`  | Interactively select rules to enable                |
+| `init`          | Generate a `route-auditor.config.json` config file  |
+| `report <file>` | Re-render a saved JSON audit in any output format   |
+
+## Audit Options
+
+| Option                   | Description                                               | Default   |
+| ------------------------ | --------------------------------------------------------- | --------- |
+| `-o, --output <format>`  | Output format: `console`, `json`, `sarif`                 | `console` |
+| `-s, --severity <level>` | Minimum severity: `critical` `high` `medium` `low` `info` | `info`    |
+| `--fail-on <level>`      | Exit with code 1 if issues at this severity or higher     | —         |
+| `--file <path>`          | Write output to file instead of stdout                    | —         |
+| `--config <path>`        | Path to `route-auditor.config.json`                       | —         |
+
+## Rules
+
+| ID                | Name                         | Severity | Description                                               |
+| ----------------- | ---------------------------- | -------- | --------------------------------------------------------- |
+| `RW-AUTH-001`     | Unprotected API Route        | high     | API route with no auth check                              |
+| `RW-AUTH-002`     | Missing CSRF Protection      | high     | Server Action with no CSRF guard                          |
+| `RW-AUTH-003`     | Unprotected Sensitive Page   | medium   | Admin/dashboard page with no auth check                   |
+| `RW-CORS-001`     | Permissive CORS Policy       | high     | Wildcard `Access-Control-Allow-Origin: *`                 |
+| `RW-ENV-001`      | Exposed Environment Variable | high     | Sensitive env var leaked in a response                    |
+| `RW-WEBHOOK-001`  | Missing Webhook Verification | high     | Webhook route with no signature verification              |
+| `RW-PATH-001`     | Path Traversal               | high     | Filesystem operation using unvalidated user input         |
+| `RW-SECRET-001`   | Hardcoded Secret             | critical | API key or secret hardcoded in source code                |
+| `RW-RATE-001`     | Missing Rate Limiting        | medium   | API route with no rate-limit (high on auth endpoints)     |
+| `RW-INPUT-001`    | Missing Input Validation     | medium   | POST/PUT route that parses body without schema validation |
+| `RW-REDIRECT-001` | Open Redirect                | medium   | `redirect()` called with unvalidated user-supplied URL    |
+| `RW-COOKIE-001`   | Insecure Cookie              | medium   | Cookie set without `HttpOnly`, `Secure`, or `SameSite`   |
 
 ## CI Integration
 
@@ -101,29 +123,29 @@ steps:
 ```bash
 # Fail the pipeline if any high or critical vulnerabilities are found
 route-auditor audit . --fail-on high
-```
 
-```bash
 # Export a SARIF report for GitHub Code Scanning
 route-auditor audit . --output sarif --file results.sarif
 ```
 
 ## Configuration
 
+Run `route-auditor init` to generate a config file, or create `route-auditor.config.json` manually:
+
 ```json
 {
   "severity": "medium",
   "failOn": "high",
   "rules": {
-    "RW-AUTH-001": false
+    "RW-RATE-001": false
   },
-  "ignore": ["app/api/health/**"]
+  "ignore": ["/api/health", "/api/public/*", "/api/internal/**"]
 }
 ```
 
-## Contributing
+All rules are enabled by default. Set a rule to `false` to disable it, or use `route-auditor rules disable` to manage rules interactively.
 
-Want to contribute? Check out the codebase and submit a PR.
+## Contributing
 
 ```bash
 git clone https://github.com/ayaxsoft/route-auditor
@@ -140,4 +162,4 @@ node packages/cli/dist/index.js audit /path/to/your/nextjs-project
 
 ## License
 
-route-auditor is MIT-licensed open-source software.
+MIT
