@@ -103,7 +103,7 @@ All rules are enabled by default. Set a rule to `false` to disable it, or use `r
 | `RW-RATE-001`     | Missing Rate Limiting        | medium   | API route with no rate-limit (high on auth endpoints)     |
 | `RW-INPUT-001`    | Missing Input Validation     | medium   | POST/PUT route that parses body without schema validation |
 | `RW-REDIRECT-001` | Open Redirect                | medium   | `redirect()` called with unvalidated user-supplied URL    |
-| `RW-COOKIE-001`   | Insecure Cookie              | medium   | Cookie set without `HttpOnly`, `Secure`, or `SameSite`   |
+| `RW-COOKIE-001`   | Insecure Cookie              | medium   | Cookie set without `HttpOnly`, `Secure`, or `SameSite`    |
 
 ## CI Integration
 
