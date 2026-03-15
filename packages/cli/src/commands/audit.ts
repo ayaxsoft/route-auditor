@@ -63,7 +63,9 @@ export const auditCommand = new Command('audit')
       ? resolve(options.config)
       : existsSync(resolve(projectRoot, 'route-auditor.config.json'))
         ? resolve(projectRoot, 'route-auditor.config.json')
-        : null
+        : existsSync(resolve('route-auditor.config.json'))
+          ? resolve('route-auditor.config.json')
+          : null
 
     const fileConfig: AuditConfig = configPath ? loadConfigFile(configPath) : {}
 

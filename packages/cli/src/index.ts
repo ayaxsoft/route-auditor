@@ -21,6 +21,7 @@ import { Command } from 'commander'
 import { auditCommand } from './commands/audit'
 import { initCommand } from './commands/init'
 import { reportCommand } from './commands/report'
+import { rulesCommand } from './commands/rules'
 
 const program = new Command()
 
@@ -29,5 +30,6 @@ program.name('route-auditor').description('Security auditor for Next.js routes')
 program.addCommand(auditCommand)
 program.addCommand(initCommand)
 program.addCommand(reportCommand)
+program.addCommand(rulesCommand)
 
 program.parse(process.argv)

@@ -1,20 +1,12 @@
 import type { AuditResult, Severity, Vulnerability } from '../types'
-import type { ChalkInstance } from 'chalk'
 import { relative } from 'path'
 import chalk from 'chalk'
 import boxen from 'boxen'
+import { SEVERITY_COLOR } from '../utils/severity-color'
 
 const BAR_WIDTH = 40
 const BAR_FILLED = '█'
 const BAR_EMPTY = '░'
-
-const SEVERITY_COLOR: Record<Severity, ChalkInstance> = {
-  critical: chalk.red.bold,
-  high: chalk.red,
-  medium: chalk.yellow,
-  low: chalk.blue,
-  info: chalk.gray,
-}
 
 const EFFORT_LABEL: Record<string, string> = {
   trivial: 'trivial',

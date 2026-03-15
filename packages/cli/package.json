@@ -33,11 +33,12 @@
     "release": "pnpm build && npm publish --access public"
   },
   "dependencies": {
-    "commander": "latest",
-    "chalk": "latest",
-    "ora": "latest",
+    "@inquirer/prompts": "^8.3.0",
     "boxen": "latest",
+    "chalk": "latest",
+    "commander": "latest",
     "glob": "latest",
+    "ora": "latest",
     "zod": "latest"
   },
   "devDependencies": {

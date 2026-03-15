@@ -7,6 +7,10 @@ import { missingInputValidation } from './missing-input-validation'
 import { exposedEnvVariable } from './exposed-env-variable'
 import { unprotectedSensitivePage } from './unprotected-sensitive-page'
 import { openRedirect } from './open-redirect'
+import { insecureCookie } from './insecure-cookie'
+import { missingWebhookVerification } from './missing-webhook-verification'
+import { pathTraversal } from './path-traversal'
+import { hardcodedSecret } from './hardcoded-secret'
 
 export const ALL_RULES: AuditRule[] = [
   unprotectedApiRoute,
@@ -17,4 +21,8 @@ export const ALL_RULES: AuditRule[] = [
   exposedEnvVariable,
   unprotectedSensitivePage,
   openRedirect,
+  insecureCookie,
+  missingWebhookVerification,
+  pathTraversal,
+  hardcodedSecret,
 ]

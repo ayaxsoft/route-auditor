@@ -1,0 +1,6 @@
+{
+  "rules": {
+    "RW-AUTH-001": false,
+    "RW-RATE-001": false
+  }
+}
