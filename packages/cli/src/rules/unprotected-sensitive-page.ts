@@ -6,6 +6,7 @@ import type {
   DetectedStack,
   Fix,
 } from '../types'
+import { detectsAuth } from '../utils/detect-auth'
 
 const SENSITIVE_PATH_SEGMENTS = [
   'admin',
@@ -25,16 +26,6 @@ const SENSITIVE_PATH_SEGMENTS = [
   'private',
   'secure',
 ]
-
-const AUTH_SIGNATURES: Record<NonNullable<DetectedStack['auth']>, string[]> = {
-  'next-auth': ['getServerSession', 'getToken', 'next-auth'],
-  'auth-js': ['getServerSession', 'getToken', '@auth/'],
-  clerk: ['auth()', 'currentUser()', '@clerk/', 'clerkClient', 'protect()'],
-  lucia: ['validateRequest', 'lucia'],
-  'better-auth': ['auth.api', 'better-auth', 'fromNodeHeaders'],
-  supabase: ['supabase.auth', '@supabase/', 'createClient'],
-  custom: ['auth', 'session', 'token', 'user'],
-}
 
 const GENERIC_AUTH_SIGNATURES = [
   'getServerSession',
@@ -96,20 +87,6 @@ const GENERIC_FIX: Fix = {
 const isSensitivePage = (routePath: string): boolean =>
   SENSITIVE_PATH_SEGMENTS.some((innerSegment) => routePath.toLowerCase().includes(innerSegment))
 
-const hasAuthSignature = (rawContent: string, signatures: string[]): boolean =>
-  signatures.some((innerSignature) => rawContent.includes(innerSignature))
-
-const detectsAuth = (route: RouteFile, context: AuditContext): boolean => {
-  const { detectedStack } = context
-
-  if (detectedStack.auth) {
-    const signatures = AUTH_SIGNATURES[detectedStack.auth]
-    if (hasAuthSignature(route.rawContent, signatures)) return true
-  }
-
-  return hasAuthSignature(route.rawContent, GENERIC_AUTH_SIGNATURES)
-}
-
 const buildFix = (detectedAuth: DetectedStack['auth']): Fix =>
   detectedAuth ? AUTH_FIX[detectedAuth] : GENERIC_FIX
 
@@ -124,7 +101,7 @@ export const unprotectedSensitivePage: AuditRule = {
     if (route.isApiRoute) return []
     if (route.routerType !== 'app') return []
     if (!isSensitivePage(route.routePath)) return []
-    if (detectsAuth(route, context)) return []
+    if (detectsAuth(route, context, GENERIC_AUTH_SIGNATURES)) return []
 
     return [
       {

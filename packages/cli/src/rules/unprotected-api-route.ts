@@ -6,16 +6,7 @@ import type {
   DetectedStack,
   Fix,
 } from '../types'
-
-const AUTH_SIGNATURES: Record<NonNullable<DetectedStack['auth']>, string[]> = {
-  'next-auth': ['getServerSession', 'getToken', 'next-auth'],
-  'auth-js': ['getServerSession', 'getToken', '@auth/'],
-  clerk: ['auth()', 'currentUser()', '@clerk/', 'clerkClient'],
-  lucia: ['validateRequest', 'lucia'],
-  'better-auth': ['auth.api', 'better-auth', 'fromNodeHeaders'],
-  supabase: ['supabase.auth', '@supabase/', 'createClient'],
-  custom: ['auth', 'session', 'token', 'user'],
-}
+import { detectsAuth } from '../utils/detect-auth'
 
 const GENERIC_AUTH_SIGNATURES = [
   'Authorization',
@@ -73,24 +64,9 @@ const GENERIC_FIX: Fix = {
   effort: 'low',
 }
 
-const hasAuthSignature = (rawContent: string, signatures: string[]): boolean =>
-  signatures.some((innerSignature) => rawContent.includes(innerSignature))
-
 const buildFix = (detectedAuth: DetectedStack['auth']): Fix => {
   if (detectedAuth) return AUTH_FIX[detectedAuth]
   return GENERIC_FIX
-}
-
-const detectsAuth = (route: RouteFile, context: AuditContext): boolean => {
-  const { detectedStack } = context
-  const { rawContent } = route
-
-  if (detectedStack.auth) {
-    const signatures = AUTH_SIGNATURES[detectedStack.auth]
-    if (hasAuthSignature(rawContent, signatures)) return true
-  }
-
-  return hasAuthSignature(rawContent, GENERIC_AUTH_SIGNATURES)
 }
 
 export const unprotectedApiRoute: AuditRule = {
@@ -102,7 +78,7 @@ export const unprotectedApiRoute: AuditRule = {
   enabled: true,
   check(route: RouteFile, context: AuditContext): Vulnerability[] {
     if (!route.isApiRoute) return []
-    if (detectsAuth(route, context)) return []
+    if (detectsAuth(route, context, GENERIC_AUTH_SIGNATURES)) return []
 
     return [
       {

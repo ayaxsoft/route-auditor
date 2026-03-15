@@ -9,8 +9,7 @@ import { ALL_RULES } from '../rules'
 import { renderHeader, renderConsoleReport } from '../reporters/console'
 import { renderJsonReport } from '../reporters/json'
 import { renderSarifReport } from '../reporters/sarif'
-
-const SEVERITY_ORDER: Severity[] = ['critical', 'high', 'medium', 'low', 'info']
+import { SEVERITY_ORDER } from '@route-auditor/shared'
 
 const meetsFailThreshold = (severity: Severity, failOn: Severity): boolean =>
   SEVERITY_ORDER.indexOf(severity) <= SEVERITY_ORDER.indexOf(failOn)
@@ -98,7 +97,7 @@ export const auditCommand = new Command('audit')
       process.exit(1)
     }
 
-    const output = config.output ?? 'console'
+    const output = config.output
 
     let rendered: string | null = null
     if (output === 'json') {
