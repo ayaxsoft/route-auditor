@@ -1,5 +1,11 @@
 # @route-auditor/cli
 
+## 0.1.6
+
+### Patch Changes
+
+- 0586b29: Fix code style violations per AGENTS.md rules
+
 ## 0.1.5
 
 ### Patch Changes
