@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   description:
     'Catch security issues in your Next.js routes before they reach production. Scans App Router, Pages Router, and API Routes.',
   keywords: ['nextjs', 'security', 'audit', 'cli', 'routes'],
+  icons: {
+    icon: '/logo.svg',
+  },
   openGraph: {
     title: 'route-auditor',
     description: 'Catch security issues in your Next.js routes before they reach production.',

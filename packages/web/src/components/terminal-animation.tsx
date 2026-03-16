@@ -268,7 +268,7 @@ const TerminalAnimation = () => {
         <span className="h-3 w-3 rounded-full bg-red-500/60" />
         <span className="h-3 w-3 rounded-full bg-amber-500/60" />
         <span className="h-3 w-3 rounded-full bg-emerald-500/60" />
-        <span className="ml-2 font-mono text-xs text-black/20 dark:text-white/20">
+        <span className="ml-2 font-mono text-xs text-black/20 dark:text-white/50">
           ~/nextjs-project
         </span>
         {isComplete && (
