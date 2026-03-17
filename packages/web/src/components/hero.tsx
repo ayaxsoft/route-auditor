@@ -11,6 +11,8 @@ const GITHUB_URL = 'https://github.com/ayaxsoft/route-auditor'
 const INSTALL_COMMAND = 'npx @route-auditor/cli audit .'
 const BRAND_COLOR = '#6155f5'
 const BRAND_HOVER = '#4f44e0'
+const EVENT_COPY_INSTALL_COMMAND = 'copy_install_command'
+const EVENT_GITHUB_STAR_CLICK = 'github_star_click'
 interface SonarOrigin {
   x: number
   y: number
@@ -52,12 +54,13 @@ const Hero = () => {
   const copyBtnRef = useRef<HTMLButtonElement>(null)
 
   const handleDone = useCallback(() => setSonarOrigin(null), [])
+  const handleGitHubClick = useCallback(() => track(EVENT_GITHUB_STAR_CLICK), [])
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(INSTALL_COMMAND)
     setIsCopied(true)
     setTimeout(() => setIsCopied(false), 2000)
-    track('copy_install_command')
+    track(EVENT_COPY_INSTALL_COMMAND)
 
     const btn = copyBtnRef.current
     if (btn) {
@@ -147,7 +150,7 @@ const Hero = () => {
               href={GITHUB_URL}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={() => track('github_star_click')}
+              onClick={handleGitHubClick}
               style={{ backgroundColor: BRAND_COLOR }}
               className="relative inline-flex h-9 items-center gap-2 overflow-hidden rounded-md px-3.5 text-[0.8125rem] font-medium whitespace-nowrap text-white transition-colors hover:bg-[#4f44e0]"
             >
