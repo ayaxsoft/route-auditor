@@ -1,5 +1,22 @@
 # @route-auditor/cli
 
+## 0.4.0
+
+### Minor Changes
+
+- f5c43ae: feat: add security rules, rules management command, and test coverage
+  - Add 4 new audit rules: insecure cookies (RW-COOKIE-001), missing webhook
+    verification (RW-WEBHOOK-001), path traversal (RW-PATH-001), and hardcoded
+    secret detection (RW-SECRET-001)
+  - Add `rules` CLI command to list, enable, and disable rules interactively
+  - Fix audit command config resolution to fall back to cwd when config not
+    found in projectRoot
+
+### Patch Changes
+
+- f5c43ae: Fix crash when running CLI via npx — replace `createRequire(import.meta.url)` with a build-time constant injected by tsup, which works in both CJS and ESM bundles.
+- f5c43ae: Fix code style violations per AGENTS.md rules
+
 ## 0.3.0
 
 ### Minor Changes
