@@ -3,6 +3,7 @@ import { GeistMono } from 'geist/font/mono'
 import { GeistSans } from 'geist/font/sans'
 import { cn } from '@/lib/utils'
 import ThemeProvider from '@/components/theme-provider'
+import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -29,6 +30,7 @@ const RootLayout = ({ children }: RootLayoutProps) => {
     <html lang="en" suppressHydrationWarning className={cn(GeistSans.variable, GeistMono.variable)}>
       <body>
         <ThemeProvider>{children}</ThemeProvider>
+        <Analytics />
       </body>
     </html>
   )

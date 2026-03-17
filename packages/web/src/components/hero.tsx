@@ -3,6 +3,7 @@
 import { AnimatePresence, LazyMotion, domAnimation, m } from 'motion/react'
 import { Check, Copy } from 'lucide-react'
 import { useCallback, useRef, useState } from 'react'
+import { track } from '@vercel/analytics'
 import TerminalAnimation from './terminal-animation'
 import { FlipWords } from './ui/flip-words'
 
@@ -56,6 +57,7 @@ const Hero = () => {
     await navigator.clipboard.writeText(INSTALL_COMMAND)
     setIsCopied(true)
     setTimeout(() => setIsCopied(false), 2000)
+    track('copy_install_command')
 
     const btn = copyBtnRef.current
     if (btn) {
@@ -145,6 +147,7 @@ const Hero = () => {
               href={GITHUB_URL}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => track('github_star_click')}
               style={{ backgroundColor: BRAND_COLOR }}
               className="relative inline-flex h-9 items-center gap-2 overflow-hidden rounded-md px-3.5 text-[0.8125rem] font-medium whitespace-nowrap text-white transition-colors hover:bg-[#4f44e0]"
             >
