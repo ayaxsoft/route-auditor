@@ -8,7 +8,7 @@ interface ThemeProviderProps {
 
 const ThemeProvider = ({ children }: ThemeProviderProps) => {
   return (
-    <NextThemesProvider attribute="class" forcedTheme="dark" disableTransitionOnChange>
+    <NextThemesProvider attribute="class" defaultTheme="dark" disableTransitionOnChange>
       {children}
     </NextThemesProvider>
   )
