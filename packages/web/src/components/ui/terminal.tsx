@@ -108,7 +108,9 @@ function useAudio(enabled: boolean) {
         if (!res.ok) return
         bufferRef.current = await ctxRef.current.decodeAudioData(await res.arrayBuffer())
         readyRef.current = true
-      } catch {}
+      } catch (_error) {
+        /* ignore audio load failure */
+      }
     }
     init()
     return () => {
