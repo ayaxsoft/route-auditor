@@ -1,4 +1,4 @@
-# <img src="packages/web/public/logo.svg" alt="route-auditor logo" width="32" height="32" style="vertical-align: middle" /> route-auditor
+# <img src="packages/web/public/logo.svg" alt="route-auditor logo" width="28" height="28" style="vertical-align: text-bottom" /> route-auditor
 
 Catch security issues in your Next.js routes before they reach production.
 
