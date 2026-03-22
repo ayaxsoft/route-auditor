@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { GeistMono } from 'geist/font/mono'
 import { GeistSans } from 'geist/font/sans'
 import { cn } from '@/lib/utils'
@@ -19,6 +19,11 @@ export const metadata: Metadata = {
     description: 'Catch security issues in your Next.js routes before they reach production.',
     type: 'website',
   },
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
 }
 
 interface RootLayoutProps {
