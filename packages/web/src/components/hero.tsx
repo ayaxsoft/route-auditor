@@ -74,14 +74,13 @@ const Hero = () => {
     <LazyMotion features={domAnimation}>
       <AnimatePresence>{sonarOrigin && <SonarOverlay origin={sonarOrigin} />}</AnimatePresence>
 
-      <section className="mx-auto grid w-full max-w-6xl grid-cols-[1fr_1.1fr] items-center gap-20 px-8">
-        {/* Left — text */}
-        <div className="flex flex-col gap-7">
+      <section className="mx-auto grid w-full min-w-0 max-w-6xl grid-cols-1 items-center gap-10 lg:grid-cols-[1fr_1.1fr] lg:gap-20">
+        <div className="flex min-w-0 flex-col gap-6 sm:gap-7">
           <p className="font-[family-name:var(--font-geist-mono)] text-xs tracking-widest uppercase text-zinc-400 dark:text-white/30">
             Next.js · Security · CLI
           </p>
 
-          <h1 className="text-[2.75rem] leading-[1.08] font-semibold tracking-[-0.03em] text-zinc-900 dark:text-white">
+          <h1 className="text-[1.75rem] leading-[1.12] font-semibold tracking-[-0.03em] text-zinc-900 sm:text-4xl sm:leading-[1.1] lg:text-[2.75rem] lg:leading-[1.08] dark:text-white">
             Catch
             <FlipWords
               words={[
@@ -98,13 +97,12 @@ const Hero = () => {
             in your Next.js routes before they ship
           </h1>
 
-          <p className="text-[0.9375rem] leading-[1.7] text-zinc-500 dark:text-white/40">
+          <p className="text-[0.875rem] leading-[1.65] text-zinc-500 sm:text-[0.9375rem] sm:leading-[1.7] dark:text-white/40">
             Scans App Router, Pages Router, and API Routes — detecting missing auth, CSRF gaps,
             permissive CORS, hardcoded secrets, and more.
           </p>
 
-          <div className="flex items-center gap-2.5 pt-1">
-            {/* Copy command button */}
+          <div className="flex min-w-0 flex-col gap-2.5 pt-1 sm:flex-row sm:flex-wrap sm:items-center">
             <button
               ref={copyBtnRef}
               onClick={handleCopy}
@@ -113,9 +111,9 @@ const Hero = () => {
               style={{
                 backgroundColor: isCopied ? '#10b981' : copyHover ? BRAND_HOVER : BRAND_COLOR,
               }}
-              className="inline-flex h-9 items-center gap-2.5 rounded-md px-3.5 font-[family-name:var(--font-geist-mono)] text-[0.8125rem] font-medium whitespace-nowrap text-white transition-colors"
+              className="inline-flex h-9 max-w-full min-w-0 items-center justify-center gap-2.5 overflow-x-auto rounded-md px-3 font-[family-name:var(--font-geist-mono)] text-[0.6875rem] font-medium text-white transition-colors sm:w-auto sm:max-w-none sm:justify-start sm:px-3.5 sm:text-[0.8125rem]"
             >
-              {INSTALL_COMMAND}
+              <span className="whitespace-nowrap">{INSTALL_COMMAND}</span>
               <div className="relative h-3.5 w-3.5 shrink-0">
                 <AnimatePresence mode="wait" initial={false}>
                   {isCopied ? (
@@ -152,7 +150,7 @@ const Hero = () => {
               rel="noopener noreferrer"
               onClick={handleGitHubClick}
               style={{ backgroundColor: BRAND_COLOR }}
-              className="relative inline-flex h-9 items-center gap-2 overflow-hidden rounded-md px-3.5 text-[0.8125rem] font-medium whitespace-nowrap text-white transition-colors hover:bg-[#4f44e0]"
+              className="relative inline-flex h-9 w-full shrink-0 items-center justify-center gap-2 overflow-hidden rounded-md px-3.5 text-[0.8125rem] font-medium whitespace-nowrap text-white transition-colors hover:bg-[#4f44e0] sm:w-auto"
             >
               <m.span
                 className="pointer-events-none absolute inset-0 -translate-x-full skew-x-[-20deg] bg-white/20"
@@ -175,8 +173,9 @@ const Hero = () => {
           </div>
         </div>
 
-        {/* Right — terminal */}
-        <TerminalAnimation />
+        <div className="min-w-0 w-full">
+          <TerminalAnimation />
+        </div>
       </section>
     </LazyMotion>
   )

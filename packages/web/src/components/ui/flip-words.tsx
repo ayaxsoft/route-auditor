@@ -73,7 +73,7 @@ export const FlipWords = ({
               delay: wordIndex * 0.3,
               duration: 0.3,
             }}
-            className="inline-block whitespace-nowrap"
+            className="inline-block max-w-full whitespace-normal break-words sm:whitespace-nowrap"
           >
             {word.split('').map((letter, letterIndex) => (
               <motion.span

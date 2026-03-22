@@ -106,7 +106,7 @@ const TerminalAnimation = () => {
       />
       <button
         onClick={() => setKey((k) => k + 1)}
-        className="absolute right-4 top-3 flex items-center gap-1.5 rounded px-2 py-0.5 text-xs text-neutral-500 transition-colors hover:text-neutral-300"
+        className="absolute right-2 top-2 flex items-center gap-1.5 rounded px-2 py-0.5 text-xs text-neutral-500 transition-colors hover:text-neutral-300 sm:right-4 sm:top-3"
       >
         <RotateCcw className="h-3 w-3" />
         Replay
