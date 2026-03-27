@@ -1,5 +1,11 @@
 # @route-auditor/cli
 
+## 1.0.0
+
+### Major Changes
+
+- 4e99aeb: Add og image generation
+
 ## 0.4.0
 
 ### Minor Changes
