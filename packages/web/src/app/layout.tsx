@@ -7,6 +7,7 @@ import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://route-auditor.vercel.app'),
   title: 'route-auditor — Security auditor for Next.js routes',
   description:
     'Catch security issues in your Next.js routes before they reach production. Scans App Router, Pages Router, and API Routes.',
@@ -19,13 +20,13 @@ export const metadata: Metadata = {
     description: 'Catch security issues in your Next.js routes before they reach production.',
     type: 'website',
     url: 'https://route-auditor.vercel.app',
-    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+    images: [{ url: '/og', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'route-auditor — Security auditor for Next.js routes',
     description: 'Catch security issues in your Next.js routes before they reach production.',
-    images: ['/og-image.png'],
+    images: ['/og'],
   },
 }
 
