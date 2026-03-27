@@ -1,7 +1,7 @@
 import type { AuditConfig, Severity } from '../types'
 import { Command, Option } from 'commander'
 import { resolve } from 'path'
-import { writeFileSync, readFileSync, existsSync, statSync } from 'fs'
+import { writeFileSync, existsSync, statSync } from 'fs'
 import chalk from 'chalk'
 import ora from 'ora'
 import { runAudit } from '../analyzers/engine'
@@ -10,6 +10,7 @@ import { renderHeader, renderConsoleReport } from '../reporters/console'
 import { renderJsonReport } from '../reporters/json'
 import { renderSarifReport } from '../reporters/sarif'
 import { SEVERITY_ORDER } from '@route-auditor/shared'
+import { loadConfig } from '../utils/load-config'
 
 const meetsFailThreshold = (severity: Severity, failOn: Severity): boolean =>
   SEVERITY_ORDER.indexOf(severity) <= SEVERITY_ORDER.indexOf(failOn)
@@ -19,7 +20,7 @@ const loadConfigFile = (configPath: string): AuditConfig => {
     console.error(`Config file not found: ${configPath}`)
     process.exit(1)
   }
-  return JSON.parse(readFileSync(configPath, 'utf-8')) as AuditConfig
+  return loadConfig(configPath)
 }
 
 interface AuditOptions {

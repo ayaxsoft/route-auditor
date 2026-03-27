@@ -25,7 +25,9 @@ import { rulesCommand } from './commands/rules'
 
 const program = new Command()
 
-program.name('route-auditor').description('Security auditor for Next.js routes').version('1.0.0')
+declare const __PACKAGE_VERSION__: string
+
+program.name('route-auditor').description('Security auditor for Next.js routes').version(__PACKAGE_VERSION__)
 
 program.addCommand(auditCommand)
 program.addCommand(initCommand)

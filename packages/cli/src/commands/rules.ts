@@ -1,18 +1,14 @@
 import type { AuditConfig, AuditRule } from '../types'
 import { Command } from 'commander'
 import { resolve, join } from 'path'
-import { existsSync, readFileSync, writeFileSync } from 'fs'
+import { writeFileSync } from 'fs'
 import chalk from 'chalk'
 import { checkbox } from '@inquirer/prompts'
 import { ALL_RULES } from '../rules'
 import { SEVERITY_COLOR } from '../utils/severity-color'
+import { loadConfig } from '../utils/load-config'
 
 const CONFIG_FILENAME = 'route-auditor.config.json'
-
-const loadConfig = (configPath: string): AuditConfig => {
-  if (!existsSync(configPath)) return {}
-  return JSON.parse(readFileSync(configPath, 'utf-8'))
-}
 
 const saveConfig = (configPath: string, config: AuditConfig): void => {
   writeFileSync(configPath, JSON.stringify(config, null, 2) + '\n', 'utf-8')

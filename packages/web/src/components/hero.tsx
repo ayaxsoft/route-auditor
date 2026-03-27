@@ -57,7 +57,16 @@ const Hero = () => {
   const handleGitHubClick = useCallback(() => track(EVENT_GITHUB_STAR_CLICK), [])
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(INSTALL_COMMAND)
+    try {
+      await navigator.clipboard.writeText(INSTALL_COMMAND)
+    } catch {
+      const el = document.createElement('textarea')
+      el.value = INSTALL_COMMAND
+      document.body.appendChild(el)
+      el.select()
+      document.execCommand('copy')
+      document.body.removeChild(el)
+    }
     setIsCopied(true)
     setTimeout(() => setIsCopied(false), 2000)
     track(EVENT_COPY_INSTALL_COMMAND)
@@ -108,6 +117,7 @@ const Hero = () => {
               onClick={handleCopy}
               onMouseEnter={() => setCopyHover(true)}
               onMouseLeave={() => setCopyHover(false)}
+              aria-label={`Copy install command: ${INSTALL_COMMAND}`}
               style={{
                 backgroundColor: isCopied ? '#10b981' : copyHover ? BRAND_HOVER : BRAND_COLOR,
               }}

@@ -63,17 +63,19 @@ runs:
           ARGS="$ARGS --config ${{ inputs.config }}"
         fi
 
+        # Run audit once, store as JSON
+        npx @route-auditor/cli@${{ inputs.version }} audit $ARGS --output json 2>/dev/null > /tmp/route-audit-result.json || true
+
+        # Render console output for PR comment
+        npx @route-auditor/cli@${{ inputs.version }} report /tmp/route-audit-result.json > /tmp/route-audit-output.txt 2>&1 || true
+
+        # Generate SARIF if requested
         if [ -n "${{ inputs.sarif-file }}" ]; then
-          ARGS="$ARGS --output sarif --file ${{ inputs.sarif-file }}"
+          npx @route-auditor/cli@${{ inputs.version }} report /tmp/route-audit-result.json --output sarif --file ${{ inputs.sarif-file }} || true
           echo "sarif-file=${{ inputs.sarif-file }}" >> $GITHUB_OUTPUT
         fi
 
-        # Run audit, capture output, never fail here
-        npx @route-auditor/cli@${{ inputs.version }} audit $ARGS > /tmp/route-audit-output.txt 2>&1 || true
-
-        # Store exit code separately for fail-on logic
-        npx @route-auditor/cli@${{ inputs.version }} audit $ARGS --output json 2>/dev/null > /tmp/route-audit-result.json || EXIT_CODE=$?
-        echo "exit-code=${EXIT_CODE:-0}" >> $GITHUB_OUTPUT
+        echo "exit-code=0" >> $GITHUB_OUTPUT
 
     - name: Post PR comment
       if: github.event_name == 'pull_request'
