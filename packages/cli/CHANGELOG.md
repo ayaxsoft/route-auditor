@@ -1,5 +1,11 @@
 # @route-auditor/cli
 
+## 2.0.0
+
+### Major Changes
+
+- d78d611: Add version into the CLI
+
 ## 1.0.0
 
 ### Major Changes
