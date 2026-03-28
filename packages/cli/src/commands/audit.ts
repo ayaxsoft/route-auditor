@@ -1,4 +1,4 @@
-import type { AuditConfig, Severity } from '../types'
+import type { AuditConfig, AuditResult, Severity } from '../types'
 import { Command, Option } from 'commander'
 import { resolve } from 'path'
 import { writeFileSync, existsSync, statSync } from 'fs'
@@ -11,6 +11,7 @@ import { renderJsonReport } from '../reporters/json'
 import { renderSarifReport } from '../reporters/sarif'
 import { SEVERITY_ORDER } from '@route-auditor/shared'
 import { loadConfig } from '../utils/load-config'
+import { watchRoutes } from '../utils/watch'
 
 const meetsFailThreshold = (severity: Severity, failOn: Severity): boolean =>
   SEVERITY_ORDER.indexOf(severity) <= SEVERITY_ORDER.indexOf(failOn)
@@ -23,12 +24,56 @@ const loadConfigFile = (configPath: string): AuditConfig => {
   return loadConfig(configPath)
 }
 
+const runAndRender = async (
+  projectRoot: string,
+  config: AuditConfig,
+  isConsoleOutput: boolean,
+): Promise<AuditResult | null> => {
+  const spinner = isConsoleOutput ? ora('Scanning routes...').start() : null
+
+  let result: AuditResult
+  try {
+    result = await runAudit(projectRoot, config)
+    if (result.routes.length === 0) {
+      spinner?.warn('No routes found — is this a Next.js project?')
+    } else {
+      spinner?.succeed(`Scanned ${result.routes.length} routes in ${result.duration}ms`)
+    }
+  } catch (error) {
+    spinner?.fail(error instanceof Error ? error.message : 'Audit failed')
+    return null
+  }
+
+  const output = config.output
+
+  let rendered: string | null = null
+  if (output === 'json') {
+    rendered = renderJsonReport(result)
+  } else if (output === 'sarif') {
+    rendered = renderSarifReport(result, ALL_RULES)
+  } else {
+    renderConsoleReport(result)
+  }
+
+  if (rendered !== null) {
+    if (config.outputFile) {
+      writeFileSync(resolve(config.outputFile), rendered, 'utf-8')
+      console.log(`Output written to ${config.outputFile}`)
+    } else {
+      console.log(rendered)
+    }
+  }
+
+  return result
+}
+
 interface AuditOptions {
   output: 'console' | 'json' | 'sarif'
   severity: Severity
   failOn?: Severity
   file?: string
   config?: string
+  watch?: boolean
 }
 
 export const auditCommand = new Command('audit')
@@ -52,6 +97,7 @@ export const auditCommand = new Command('audit')
   )
   .option('--file <path>', 'Write output to file instead of stdout')
   .option('--config <path>', 'Path to route-auditor.config.json')
+  .option('-w, --watch', 'Watch for file changes and re-run the audit')
   .action(async (directory: string, options: AuditOptions) => {
     const projectRoot = resolve(directory)
 
@@ -85,44 +131,29 @@ export const auditCommand = new Command('audit')
       console.log()
     }
 
-    const spinner = isConsoleOutput ? ora('Scanning routes...').start() : null
+    const result = await runAndRender(projectRoot, config, isConsoleOutput)
 
-    let result
-    try {
-      result = await runAudit(projectRoot, config)
-      if (result.routes.length === 0) {
-        spinner?.warn('No routes found — is this a Next.js project?')
-      } else {
-        spinner?.succeed(`Scanned ${result.routes.length} routes in ${result.duration}ms`)
-      }
-    } catch (error) {
-      spinner?.fail(error instanceof Error ? error.message : 'Audit failed')
-      process.exit(1)
+    if (options.watch) {
+      console.log()
+      console.log(chalk.dim('  Watching for changes… Press Ctrl+C to stop.'))
+
+      watchRoutes(projectRoot, configPath, async () => {
+        if (isConsoleOutput) {
+          renderHeader()
+          console.log()
+        }
+        await runAndRender(projectRoot, config, isConsoleOutput)
+        console.log()
+        console.log(chalk.dim('  Watching for changes… Press Ctrl+C to stop.'))
+      })
+      return
     }
 
-    const output = config.output
-
-    let rendered: string | null = null
-    if (output === 'json') {
-      rendered = renderJsonReport(result)
-    } else if (output === 'sarif') {
-      rendered = renderSarifReport(result, ALL_RULES)
-    } else {
-      renderConsoleReport(result)
-    }
-
-    if (rendered !== null) {
-      if (config.outputFile) {
-        writeFileSync(resolve(config.outputFile), rendered, 'utf-8')
-        console.log(`Output written to ${config.outputFile}`)
-      } else {
-        console.log(rendered)
-      }
-    }
+    if (!result) process.exit(1)
 
     if (config.failOn) {
-      const shouldFail = result.vulnerabilities.some((vulnerability) =>
-        meetsFailThreshold(vulnerability.severity, config.failOn!),
+      const shouldFail = result.vulnerabilities.some((v) =>
+        meetsFailThreshold(v.severity, config.failOn!),
       )
       if (shouldFail) process.exit(1)
     }

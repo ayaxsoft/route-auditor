@@ -36,6 +36,7 @@
     "@inquirer/prompts": "^8.3.0",
     "boxen": "latest",
     "chalk": "latest",
+    "chokidar": "^5.0.0",
     "commander": "latest",
     "glob": "latest",
     "ora": "latest",
