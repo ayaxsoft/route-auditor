@@ -1,5 +1,11 @@
 # @route-auditor/cli
 
+## 3.0.0
+
+### Major Changes
+
+- ffffeda: Add `--watch` / `-w` flag to the `audit` command
+
 ## 2.0.0
 
 ### Major Changes
