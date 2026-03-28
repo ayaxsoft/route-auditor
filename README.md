@@ -48,6 +48,7 @@ Audit Next.js routes for security issues.
 | `--fail-on <level>`      | Exit with code 1 if issues at this severity or higher     | —         |
 | `--file <path>`          | Write output to file instead of stdout                    | —         |
 | `--config <path>`        | Path to `route-auditor.config.json`                       | —         |
+| `-w, --watch`            | Watch for file changes and re-run the audit               | —         |
 
 ## Rules
 
