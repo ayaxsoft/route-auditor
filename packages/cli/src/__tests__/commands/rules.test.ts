@@ -6,11 +6,12 @@ import { ALL_RULES } from '../../rules'
 import { isRuleEnabled, rulesCommand } from '../../commands/rules'
 import type { AuditConfig } from '../../types'
 
-vi.mock('@inquirer/prompts', () => ({ checkbox: vi.fn() }))
+vi.mock('../../ui/prompt-select-rules', () => ({ promptSelectRules: vi.fn() }))
+vi.mock('../../ui/rules-list', () => ({ renderRulesList: vi.fn() }))
 
-import { checkbox } from '@inquirer/prompts'
+import { promptSelectRules } from '../../ui/prompt-select-rules'
 
-const mockCheckbox = vi.mocked(checkbox)
+const mockPromptSelectRules = vi.mocked(promptSelectRules)
 
 const CONFIG_FILENAME = 'route-auditor.config.json'
 
@@ -55,7 +56,7 @@ describe('isRuleEnabled', () => {
 
 describe('disable persistence', () => {
   it('creates config and disables selected rules', async () => {
-    mockCheckbox.mockResolvedValue(['RW-AUTH-001', 'RW-RATE-001'])
+    mockPromptSelectRules.mockResolvedValue(['RW-AUTH-001', 'RW-RATE-001'])
     await rulesCommand.parseAsync(['node', 'rules', 'disable', tempDir])
     const config = readConfig(tempDir)
     expect(config.rules?.['RW-AUTH-001']).toBe(false)
@@ -67,7 +68,7 @@ describe('disable persistence', () => {
       join(tempDir, CONFIG_FILENAME),
       JSON.stringify({ severity: 'high', rules: { 'RW-CORS-001': false } }),
     )
-    mockCheckbox.mockResolvedValue(['RW-AUTH-001'])
+    mockPromptSelectRules.mockResolvedValue(['RW-AUTH-001'])
     await rulesCommand.parseAsync(['node', 'rules', 'disable', tempDir])
     const config = readConfig(tempDir)
     expect(config.severity).toBe('high')
@@ -76,7 +77,7 @@ describe('disable persistence', () => {
   })
 
   it('does not create config file when no rules are selected', async () => {
-    mockCheckbox.mockResolvedValue([])
+    mockPromptSelectRules.mockResolvedValue([])
     await rulesCommand.parseAsync(['node', 'rules', 'disable', tempDir])
     expect(existsSync(join(tempDir, CONFIG_FILENAME))).toBe(false)
   })
@@ -88,7 +89,7 @@ describe('enable persistence', () => {
       join(tempDir, CONFIG_FILENAME),
       JSON.stringify({ rules: { 'RW-AUTH-001': false, 'RW-RATE-001': false } }),
     )
-    mockCheckbox.mockResolvedValue(['RW-AUTH-001'])
+    mockPromptSelectRules.mockResolvedValue(['RW-AUTH-001'])
     await rulesCommand.parseAsync(['node', 'rules', 'enable', tempDir])
     const config = readConfig(tempDir)
     expect(config.rules?.['RW-AUTH-001']).toBe(true)
@@ -100,7 +101,7 @@ describe('enable persistence', () => {
       join(tempDir, CONFIG_FILENAME),
       JSON.stringify({ rules: { 'RW-AUTH-001': false } }),
     )
-    mockCheckbox.mockResolvedValue([])
+    mockPromptSelectRules.mockResolvedValue([])
     await rulesCommand.parseAsync(['node', 'rules', 'enable', tempDir])
     const config = readConfig(tempDir)
     expect(config.rules?.['RW-AUTH-001']).toBe(false)

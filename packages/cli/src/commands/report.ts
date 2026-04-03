@@ -2,9 +2,8 @@ import type { AuditResult } from '../types'
 import { Command, Option } from 'commander'
 import { resolve } from 'path'
 import { readFileSync, writeFileSync, existsSync } from 'fs'
-import chalk from 'chalk'
 import { ALL_RULES } from '../rules'
-import { renderConsoleReport, renderHeader } from '../reporters/console'
+import { renderAuditReportView } from '../ui/audit-report'
 import { renderJsonReport } from '../reporters/json'
 import { renderSarifReport } from '../reporters/sarif'
 
@@ -26,7 +25,7 @@ export const reportCommand = new Command('report')
     const inputPath = resolve(jsonFile)
 
     if (!existsSync(inputPath)) {
-      console.error(`\n  ${chalk.red('✗')} File not found: ${chalk.bold(jsonFile)}\n`)
+      console.error(`\n  ✗ File not found: ${jsonFile}\n`)
       process.exit(1)
     }
 
@@ -34,16 +33,12 @@ export const reportCommand = new Command('report')
     try {
       result = JSON.parse(readFileSync(inputPath, 'utf-8')) as AuditResult
     } catch {
-      console.error(
-        `\n  ${chalk.red('✗')} Failed to parse ${chalk.bold(jsonFile)} — is it a valid audit JSON?\n`,
-      )
+      console.error(`\n  ✗ Failed to parse ${jsonFile} — is it a valid audit JSON?\n`)
       process.exit(1)
     }
 
     if (options.output === 'console') {
-      renderHeader()
-      console.log()
-      renderConsoleReport(result)
+      renderAuditReportView(result)
       return
     }
 
@@ -52,7 +47,7 @@ export const reportCommand = new Command('report')
 
     if (options.file) {
       writeFileSync(resolve(options.file), rendered, 'utf-8')
-      console.log(`\n  ${chalk.green('✔')} Report written to ${chalk.bold(options.file)}\n`)
+      console.log(`\n  ✔ Report written to ${options.file}\n`)
     } else {
       console.log(rendered)
     }

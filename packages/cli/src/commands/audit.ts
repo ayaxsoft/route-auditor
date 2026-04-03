@@ -2,11 +2,9 @@ import type { AuditConfig, AuditResult, Severity } from '../types'
 import { Command, Option } from 'commander'
 import { resolve } from 'path'
 import { writeFileSync, existsSync, statSync } from 'fs'
-import chalk from 'chalk'
-import ora from 'ora'
 import { runAudit } from '../analyzers/engine'
 import { ALL_RULES } from '../rules'
-import { renderHeader, renderConsoleReport } from '../reporters/console'
+import { renderAuditView } from '../ui/audit-view'
 import { renderJsonReport } from '../reporters/json'
 import { renderSarifReport } from '../reporters/sarif'
 import { SEVERITY_ORDER } from '@route-auditor/shared'
@@ -22,49 +20,6 @@ const loadConfigFile = (configPath: string): AuditConfig => {
     process.exit(1)
   }
   return loadConfig(configPath)
-}
-
-const runAndRender = async (
-  projectRoot: string,
-  config: AuditConfig,
-  isConsoleOutput: boolean,
-): Promise<AuditResult | null> => {
-  const spinner = isConsoleOutput ? ora('Scanning routes...').start() : null
-
-  let result: AuditResult
-  try {
-    result = await runAudit(projectRoot, config)
-    if (result.routes.length === 0) {
-      spinner?.warn('No routes found — is this a Next.js project?')
-    } else {
-      spinner?.succeed(`Scanned ${result.routes.length} routes in ${result.duration}ms`)
-    }
-  } catch (error) {
-    spinner?.fail(error instanceof Error ? error.message : 'Audit failed')
-    return null
-  }
-
-  const output = config.output
-
-  let rendered: string | null = null
-  if (output === 'json') {
-    rendered = renderJsonReport(result)
-  } else if (output === 'sarif') {
-    rendered = renderSarifReport(result, ALL_RULES)
-  } else {
-    renderConsoleReport(result)
-  }
-
-  if (rendered !== null) {
-    if (config.outputFile) {
-      writeFileSync(resolve(config.outputFile), rendered, 'utf-8')
-      console.log(`Output written to ${config.outputFile}`)
-    } else {
-      console.log(rendered)
-    }
-  }
-
-  return result
 }
 
 interface AuditOptions {
@@ -102,7 +57,7 @@ export const auditCommand = new Command('audit')
     const projectRoot = resolve(directory)
 
     if (!existsSync(projectRoot) || !statSync(projectRoot).isDirectory()) {
-      console.error(`\n  ${chalk.red('✗')} Directory not found: ${chalk.bold(projectRoot)}\n`)
+      console.error(`\n  ✗ Directory not found: ${projectRoot}\n`)
       process.exit(1)
     }
 
@@ -126,34 +81,76 @@ export const auditCommand = new Command('audit')
 
     const isConsoleOutput = config.output === 'console' && !config.outputFile
 
-    if (isConsoleOutput) {
-      renderHeader()
-      console.log()
+    if (!isConsoleOutput) {
+      let rendered: string
+      try {
+        const result = await runAudit(projectRoot, config)
+        rendered =
+          config.output === 'sarif'
+            ? renderSarifReport(result, ALL_RULES)
+            : renderJsonReport(result)
+      } catch (error) {
+        console.error(error instanceof Error ? error.message : 'Audit failed')
+        process.exit(1)
+      }
+
+      if (config.outputFile) {
+        writeFileSync(resolve(config.outputFile), rendered, 'utf-8')
+        console.log(`Output written to ${config.outputFile}`)
+      } else {
+        console.log(rendered)
+      }
+      return
     }
 
-    const result = await runAndRender(projectRoot, config, isConsoleOutput)
+    const { rerender, unmount } = renderAuditView({ phase: 'scanning' })
+
+    let result: AuditResult | null = null
+    try {
+      result = await runAudit(projectRoot, config)
+      rerender({ phase: 'success', result, watching: Boolean(options.watch) })
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Audit failed'
+      rerender({ phase: 'error', error: message })
+      unmount()
+      process.exit(1)
+    }
 
     if (options.watch) {
-      console.log()
-      console.log(chalk.dim('  Watching for changes… Press Ctrl+C to stop.'))
+      let currentChangedFile: string | null = null
 
-      watchRoutes(projectRoot, configPath, async () => {
-        if (isConsoleOutput) {
-          renderHeader()
-          console.log()
+      const stopWatching = watchRoutes(projectRoot, configPath, async (changedFile) => {
+        currentChangedFile = changedFile
+        rerender({ phase: 'scanning', result, watching: true, changedFile: currentChangedFile })
+        try {
+          result = await runAudit(projectRoot, config)
+          rerender({ phase: 'success', result, watching: true, changedFile: currentChangedFile })
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Audit failed'
+          rerender({
+            phase: 'error',
+            error: message,
+            watching: true,
+            changedFile: currentChangedFile,
+          })
         }
-        await runAndRender(projectRoot, config, isConsoleOutput)
-        console.log()
-        console.log(chalk.dim('  Watching for changes… Press Ctrl+C to stop.'))
+      })
+
+      process.once('SIGINT', () => {
+        stopWatching()
+        unmount()
+        process.exit(0)
       })
       return
     }
 
+    unmount()
+
     if (!result) process.exit(1)
 
     if (config.failOn) {
-      const shouldFail = result.vulnerabilities.some((v) =>
-        meetsFailThreshold(v.severity, config.failOn!),
+      const shouldFail = result.vulnerabilities.some((innerVulnerability) =>
+        meetsFailThreshold(innerVulnerability.severity, config.failOn!),
       )
       if (shouldFail) process.exit(1)
     }

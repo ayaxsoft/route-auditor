@@ -9,6 +9,7 @@
     "cli"
   ],
   "license": "MIT",
+  "type": "module",
   "bin": {
     "route-auditor": "./dist/index.js"
   },
@@ -33,18 +34,18 @@
     "release": "pnpm build && npm publish --access public"
   },
   "dependencies": {
-    "@inquirer/prompts": "^8.3.0",
-    "boxen": "latest",
-    "chalk": "latest",
+    "@inkjs/ui": "latest",
     "chokidar": "^5.0.0",
     "commander": "latest",
     "glob": "latest",
-    "ora": "latest",
+    "ink": "latest",
+    "react": "latest",
     "zod": "latest"
   },
   "devDependencies": {
     "@route-auditor/shared": "workspace:*",
     "@types/node": "latest",
+    "@types/react": "latest",
     "@vitest/coverage-v8": "latest",
     "tsup": "latest",
     "typescript": "latest",

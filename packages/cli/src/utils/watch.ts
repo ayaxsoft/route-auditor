@@ -1,12 +1,9 @@
 import chokidar from 'chokidar'
 import { join, relative, extname } from 'path'
 import { existsSync } from 'fs'
-import chalk from 'chalk'
 
 const WATCH_DIRS = ['app', 'src/app', 'pages', 'src/pages']
 const WATCH_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs'])
-
-const timestamp = (): string => new Date().toLocaleTimeString('en-US', { hour12: false })
 
 const buildWatchPaths = (projectRoot: string, configPath: string | null): string[] => {
   const dirs = WATCH_DIRS.map((dir) => join(projectRoot, dir)).filter(existsSync)
@@ -18,12 +15,11 @@ export const watchRoutes = (
   projectRoot: string,
   configPath: string | null,
   onChanged: (changedFile: string) => Promise<void>,
-): void => {
+): (() => void) => {
   const paths = buildWatchPaths(projectRoot, configPath)
 
   if (paths.length === 0) {
-    console.log(chalk.yellow('  ⚠ No route directories found to watch.'))
-    return
+    return () => undefined
   }
 
   let debounceTimer: ReturnType<typeof setTimeout> | null = null
@@ -33,14 +29,9 @@ export const watchRoutes = (
   const handleChange = (filePath: string) => {
     if (!WATCH_EXTENSIONS.has(extname(filePath))) return
     if (debounceTimer) clearTimeout(debounceTimer)
-    debounceTimer = setTimeout(async () => {
-      const rel = relative(projectRoot, filePath)
-      console.log()
-      console.log(chalk.dim('─'.repeat(60)))
-      console.log(`${chalk.dim('Changed:')} ${chalk.bold(rel)}  ${chalk.dim(timestamp())}`)
-      console.log(chalk.dim('─'.repeat(60)))
-      console.log()
-      await onChanged(rel)
+    debounceTimer = setTimeout(() => {
+      const relativeFilePath = relative(projectRoot, filePath)
+      void onChanged(relativeFilePath)
     }, 300)
   }
 
@@ -48,9 +39,7 @@ export const watchRoutes = (
   watcher.on('add', handleChange)
   watcher.on('unlink', handleChange)
 
-  process.on('SIGINT', () => {
+  return () => {
     void watcher.close()
-    console.log()
-    process.exit(0)
-  })
+  }
 }

@@ -4,9 +4,8 @@ import { join } from 'path'
 import { tmpdir } from 'os'
 
 vi.mock('../../analyzers/engine', () => ({ runAudit: vi.fn() }))
-vi.mock('../../reporters/console', () => ({
-  renderHeader: vi.fn(),
-  renderConsoleReport: vi.fn(),
+vi.mock('../../ui/audit-view', () => ({
+  renderAuditView: vi.fn(() => ({ rerender: vi.fn(), unmount: vi.fn() })),
 }))
 
 import { auditCommand } from '../../commands/audit'

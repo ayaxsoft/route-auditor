@@ -15,4 +15,7 @@ export default defineConfig({
   define: {
     __PACKAGE_VERSION__: JSON.stringify(version),
   },
+  esbuildOptions(options) {
+    options.jsx = 'automatic'
+  },
 })

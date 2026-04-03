@@ -1,7 +1,6 @@
 import { Command } from 'commander'
 import { resolve, join } from 'path'
 import { existsSync, writeFileSync } from 'fs'
-import chalk from 'chalk'
 import { ALL_RULES } from '../rules'
 
 const CONFIG_FILENAME = 'route-auditor.config.json'
@@ -22,8 +21,8 @@ export const initCommand = new Command('init')
 
     if (existsSync(configPath) && !options.force) {
       console.log()
-      console.log(`  ${chalk.yellow('!')} ${chalk.bold(CONFIG_FILENAME)} already exists.`)
-      console.log(`  ${chalk.dim('Run with --force to overwrite.')}`)
+      console.log(`  ! ${CONFIG_FILENAME} already exists.`)
+      console.log('  Run with --force to overwrite.')
       console.log()
       process.exit(1)
     }
@@ -32,8 +31,8 @@ export const initCommand = new Command('init')
     writeFileSync(configPath, JSON.stringify(config, null, 2) + '\n', 'utf-8')
 
     console.log()
-    console.log(`  ${chalk.green('✔')} Created ${chalk.bold(CONFIG_FILENAME)}`)
+    console.log(`  ✔ Created ${CONFIG_FILENAME}`)
     console.log()
-    console.log(`  ${chalk.dim(`${ALL_RULES.length} rules enabled — edit the file to customize.`)}`)
+    console.log(`  ${ALL_RULES.length} rules enabled — edit the file to customize.`)
     console.log()
   })
