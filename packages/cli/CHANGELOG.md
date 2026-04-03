@@ -1,5 +1,11 @@
 # @route-auditor/cli
 
+## 4.0.0
+
+### Major Changes
+
+- f21f08d: Migrate CLI to react ink
+
 ## 3.0.0
 
 ### Major Changes
