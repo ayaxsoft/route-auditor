@@ -59,16 +59,17 @@ describe('isRouteProtectedByLayout', () => {
     })
 
     it('returns true when layout uses clerk auth(', () => {
+      const clerkAuthSignature = 'auth('
       withLayoutAt(
         '/project/app/dashboard/layout.tsx',
         `
-        import { auth( } from '@clerk/nextjs/server'
+        import { ${clerkAuthSignature} } from '@clerk/nextjs/server'
         export default async function Layout({ children }) {
-          const { userId } = await auth()
+          const { userId } = await ${clerkAuthSignature})
           if (!userId) redirect('/sign-in')
           return <>{children}</>
         }
-        `.replace('auth(', 'auth('),
+        `,
       )
       const result = isRouteProtectedByLayout('/project/app/dashboard/page.tsx', '/project')
       expect(result).toBe(true)
