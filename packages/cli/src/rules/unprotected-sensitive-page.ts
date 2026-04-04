@@ -7,6 +7,8 @@ import type {
   Fix,
 } from '../types'
 import { detectsAuth } from '../utils/detect-auth'
+import { isRouteProtectedByMiddleware } from '../utils/detect-middleware'
+import { isRouteProtectedByLayout } from '../utils/detect-proxy'
 
 const SENSITIVE_PATH_SEGMENTS = [
   'admin',
@@ -102,6 +104,8 @@ export const unprotectedSensitivePage: AuditRule = {
     if (route.routerType !== 'app') return []
     if (!isSensitivePage(route.routePath)) return []
     if (detectsAuth(route, context, GENERIC_AUTH_SIGNATURES)) return []
+    if (isRouteProtectedByMiddleware(context.projectRoot, route.routePath)) return []
+    if (isRouteProtectedByLayout(route.filePath, context.projectRoot)) return []
 
     return [
       {

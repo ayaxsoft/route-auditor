@@ -1,6 +1,17 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { unprotectedSensitivePage } from '../../rules/unprotected-sensitive-page'
 import type { RouteFile, AuditContext } from '../../types'
+
+vi.mock('../../utils/detect-middleware', () => ({
+  isRouteProtectedByMiddleware: vi.fn().mockReturnValue(false),
+}))
+
+vi.mock('../../utils/detect-proxy', () => ({
+  isRouteProtectedByLayout: vi.fn().mockReturnValue(false),
+}))
+
+import { isRouteProtectedByMiddleware } from '../../utils/detect-middleware'
+import { isRouteProtectedByLayout } from '../../utils/detect-proxy'
 
 const buildRouteFile = (overrides: Partial<RouteFile> = {}): RouteFile => ({
   projectRoot: '/project',
@@ -126,6 +137,35 @@ describe('unprotectedSensitivePage', () => {
       const context = buildContext({ detectedStack: { auth: 'next-auth' } })
       const result = unprotectedSensitivePage.check(route, context)
       expect(result).toHaveLength(0)
+    })
+  })
+
+  describe('when route is protected by middleware or proxy', () => {
+    it('returns no vulnerabilities when middleware protects the route', () => {
+      vi.mocked(isRouteProtectedByMiddleware).mockReturnValue(true)
+      const result = unprotectedSensitivePage.check(buildRouteFile(), buildContext())
+      expect(result).toHaveLength(0)
+      vi.mocked(isRouteProtectedByMiddleware).mockReturnValue(false)
+    })
+
+    it('returns no vulnerabilities when an ancestor layout protects the route', () => {
+      vi.mocked(isRouteProtectedByLayout).mockReturnValue(true)
+      const result = unprotectedSensitivePage.check(buildRouteFile(), buildContext())
+      expect(result).toHaveLength(0)
+      vi.mocked(isRouteProtectedByLayout).mockReturnValue(false)
+    })
+
+    it('passes projectRoot and routePath to isRouteProtectedByMiddleware', () => {
+      unprotectedSensitivePage.check(buildRouteFile(), buildContext())
+      expect(isRouteProtectedByMiddleware).toHaveBeenCalledWith('/project', '/admin')
+    })
+
+    it('passes filePath and projectRoot to isRouteProtectedByLayout', () => {
+      unprotectedSensitivePage.check(buildRouteFile(), buildContext())
+      expect(isRouteProtectedByLayout).toHaveBeenCalledWith(
+        '/project/app/admin/page.tsx',
+        '/project',
+      )
     })
   })
 
