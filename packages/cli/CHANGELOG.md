@@ -1,5 +1,11 @@
 # @route-auditor/cli
 
+## 5.0.0
+
+### Major Changes
+
+- ded915b: Reduce false positives for routes protected by centralized auth mechanisms.
+
 ## 4.0.0
 
 ### Major Changes
