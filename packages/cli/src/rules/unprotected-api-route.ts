@@ -7,6 +7,7 @@ import type {
   Fix,
 } from '../types'
 import { detectsAuth } from '../utils/detect-auth'
+import { isPublicApiRoute } from '../utils/detect-public-api-route'
 
 const GENERIC_AUTH_SIGNATURES = [
   'Authorization',
@@ -78,6 +79,7 @@ export const unprotectedApiRoute: AuditRule = {
   enabled: true,
   check(route: RouteFile, context: AuditContext): Vulnerability[] {
     if (!route.isApiRoute) return []
+    if (isPublicApiRoute(route)) return []
     if (detectsAuth(route, context, GENERIC_AUTH_SIGNATURES)) return []
 
     return [
