@@ -48,7 +48,7 @@
     "@types/react": "latest",
     "@vitest/coverage-v8": "latest",
     "tsup": "latest",
-    "typescript": "latest",
+    "typescript": "~5.9.0",
     "vitest": "latest"
   }
 }
