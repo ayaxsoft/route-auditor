@@ -2,18 +2,18 @@
   "name": "route-auditor-monorepo",
   "private": true,
   "scripts": {
-    "dev": "pnpm --filter web dev",
-    "build": "pnpm -r build",
-    "build:cli": "pnpm --filter cli build",
-    "build:web": "pnpm --filter web build",
-    "test": "pnpm --filter cli test",
+    "dev": "bun --filter web dev",
+    "build": "bun --filter '*' build",
+    "build:cli": "bun --filter @route-auditor/cli build",
+    "build:web": "bun --filter web dev",
+    "test": "bun --filter @route-auditor/cli test",
     "lint": "eslint packages/",
     "lint:fix": "eslint packages/ --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "pnpm -r typecheck",
-    "clean": "pnpm -r clean",
-    "release": "pnpm --filter @route-auditor/cli release",
+    "typecheck": "bun --filter '*' typecheck",
+    "clean": "bun --filter '*' clean",
+    "release": "bun --filter @route-auditor/cli release",
     "changeset": "changeset",
     "version-packages": "changeset version"
   },
@@ -23,11 +23,13 @@
     "eslint": "latest",
     "eslint-config-prettier": "latest",
     "prettier": "latest",
-    "typescript": "latest",
+    "typescript": "~5.9.0",
     "typescript-eslint": "latest"
   },
+  "workspaces": [
+    "packages/*"
+  ],
   "engines": {
-    "node": ">=22.0.0",
-    "pnpm": ">=9.0.0"
+    "bun": ">=1.0.0"
   }
 }
